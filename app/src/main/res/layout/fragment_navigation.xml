@@ -50,7 +50,6 @@
                     android:ellipsize="end"
                     android:gravity="center_vertical"
                     android:maxLines="1"
-                    android:text="Accra Polytechnic"
                     android:textSize="@dimen/place_picker_suggest_list_row_name"
                     android:textStyle="bold" />
 
@@ -63,7 +62,6 @@
                     android:layout_toRightOf="@+id/icon"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Accra, Ghana"
                     android:textSize="@dimen/place_picker_suggest_list_row_description" />
 
                 <LinearLayout
@@ -131,7 +129,6 @@
                     android:ellipsize="end"
                     android:gravity="center_vertical"
                     android:maxLines="1"
-                    android:text="Accra Polytechnic"
                     android:textSize="@dimen/place_picker_suggest_list_row_name"
                     android:textStyle="bold" />
 
@@ -144,7 +141,6 @@
                     android:layout_toRightOf="@+id/icon"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Accra, Ghana"
                     android:textSize="@dimen/place_picker_suggest_list_row_description" />
 
                 <LinearLayout
@@ -174,7 +170,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             card_view:cardCornerRadius="2dp"
-            card_view:cardElevation="6dp">
+            card_view:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"

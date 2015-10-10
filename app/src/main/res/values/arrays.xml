@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="filter_nearby_values">
+        <item>Restaurants</item>
+        <item>Gas Station</item>
+        <item>Cafe</item>
+        <item>Rest Rooms</item>
+        <item>Parking</item>
+    </string-array>
+</resources>

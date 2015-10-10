@@ -165,7 +165,7 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
                     .zoom(17)                   // Sets the zoom
-                    .bearing(90)                // Sets the orientation of the camera to east
+                    .bearing(0)                // Sets the orientation of the camera to north
                     .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                     .build();                   // Creates a CameraPosition from the builder
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));

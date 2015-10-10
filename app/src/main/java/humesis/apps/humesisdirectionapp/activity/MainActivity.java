@@ -173,8 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 placeListButton.setEnabled(true);
                 break;
             case R.id.profile_button:
-                clearIndicator();
-                profileButton.setEnabled(true);
+
                 break;
         }
     }

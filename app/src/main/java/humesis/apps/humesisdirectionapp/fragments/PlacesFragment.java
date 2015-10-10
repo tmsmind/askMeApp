@@ -9,10 +9,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -46,6 +50,7 @@ public class PlacesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCurrentLocation = LocationManager.getLastKnownLocation(getContext());
+        setHasOptionsMenu(true);
     }
 
 
@@ -72,6 +77,42 @@ public class PlacesFragment extends Fragment {
                 new GetPlacesAsync(getContext(), "", mCurrentLocation).execute();
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.nearby_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_filter:
+                new MaterialDialog.Builder(getContext())
+                        .title("Filter Listing")
+                        .items(R.array.filter_nearby_values)
+                        .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
+                                /**
+                                 * If you use alwaysCallMultiChoiceCallback(), which is discussed below,
+                                 * returning false here won't allow the newly selected check box to actually be selected.
+                                 * See the limited multi choice dialog example in the sample project for details.
+                                 **/
+                                return true;
+                            }
+                        })
+                        .positiveText("Done")
+                        .show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public class GetPlacesAsync extends AsyncTask<Void, Void, ArrayList<Place>> {
