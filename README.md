@@ -28,7 +28,7 @@ First download the samples by cloning this repository or downloading an archived
 snapshot. (See the options on the left hand side.)
 
 In Android Studio, use the "Import Project" option. Next select the directories
-("HumesisDirectionApp" or "PlaceComplete").  If prompted for a gradle configuration
+("HumesisDirectionApp").  If prompted for a gradle configuration
 accept the default settings.
 
 Alternatively use the "gradlew build" command to build the project directly.
