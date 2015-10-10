@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_show_restaurents"
+        android:title="Restaurents"
+        android:icon="@drawable/ic_restaurant"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_show_gas_station"
+        android:title="Gas Stations"
+        android:icon="@drawable/ic_local_gas_station"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+</menu>
