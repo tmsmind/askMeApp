@@ -56,10 +56,6 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     LocationManager mLocationManager;
-    private GoogleDirection googleDirection;
-    List<Overlay> mapOverlays;
-    MapOverlayItem itemizedOverlay;
-    private boolean needsInit = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,9 +67,6 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState == null) {
-            needsInit = true;
-        }
 
         getMapAsync(this);
     }

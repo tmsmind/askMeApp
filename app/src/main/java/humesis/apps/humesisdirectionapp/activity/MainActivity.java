@@ -11,9 +11,11 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -72,7 +74,7 @@ import humesis.apps.humesisdirectionapp.utils.ui.TabButtons;
 /**
  * Created by dhanraj on 08/10/15.
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class MainActivity extends AppCompatActivity implements  GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     Toolbar toolbar;
     FragmentManager fm;
     FragmentTransaction ft;
@@ -81,15 +83,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MyViewPager viewPager;
     List<Fragment> fList = new ArrayList<>();
     ViewPagerAdapter mAdapter;
-    TabButtons mapsButton,directionButton,placeListButton,profileButton,carsButton;
     LocalProfile localProfile = new LocalProfile();
     private GoogleApiClient mGoogleApiClient;
+    TabLayout tabLayout;
 
+    private int[] imageResId = {
+            R.drawable.ic_map,
+            R.drawable.ic_car,
+            R.drawable.ic_navigation,
+            R.drawable.ic_view_list,
+            R.drawable.ic_person
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         setupViews();
 
         if (toolbar != null) {
@@ -104,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-        locationChecker();
+        humesis.apps.humesisdirectionapp.utils.LocationManager.locationChecker(mGoogleApiClient,MainActivity.this);
         setupProfileData();
         setUpNavigationDrawer();
     }
@@ -137,69 +147,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
     }
 
-
-    @Override
-    public void onClick(View view) {
-
-        switch (view.getId()){
-            case R.id.maps_button:
-//                fm.beginTransaction()
-//                        .replace(R.id.fragment_container, MapFragment.newInstance())
-//                        .commit();
-                viewPager.setCurrentItem(0,true);
-                getSupportActionBar().setTitle("Maps");
-                clearIndicator();
-                mapsButton.setEnabled(true);
-                break;
-            case R.id.cars_button:
-                viewPager.setCurrentItem(1, true);
-                getSupportActionBar().setTitle("Cars");
-                clearIndicator();
-                carsButton.setEnabled(true);
-                break;
-            case R.id.direction_button:
-//                fm.beginTransaction()
-//                        .replace(R.id.fragment_container, NavigationFragment.newInstance())
-//                        .commit();
-                viewPager.setCurrentItem(2, true);
-                getSupportActionBar().setTitle("Navigating");
-                clearIndicator();
-                directionButton.setEnabled(true);
-                break;
-            case R.id.places_list_button:
-                viewPager.setCurrentItem(3, true);
-                getSupportActionBar().setTitle("Nearby");
-                clearIndicator();
-                placeListButton.setEnabled(true);
-                break;
-            case R.id.profile_button:
-
-                break;
-        }
-    }
-
-    void clearIndicator(){
-        mapsButton.setEnabled(false);
-        carsButton.setEnabled(false);
-        directionButton.setEnabled(false);
-        placeListButton.setEnabled(false);
-        profileButton.setEnabled(false);
-    }
-
     void setupViews(){
         viewPager = (MyViewPager) findViewById(R.id.viewPager);
-        mapsButton = (TabButtons)findViewById(R.id.maps_button);
-        carsButton = (TabButtons) findViewById(R.id.cars_button);
-        directionButton = (TabButtons)findViewById(R.id.direction_button);
-        placeListButton = (TabButtons)findViewById(R.id.places_list_button);
-        profileButton = (TabButtons)findViewById(R.id.profile_button);
-
-        mapsButton.setOnClickListener(this);
-        carsButton.setOnClickListener(this);
-        directionButton.setOnClickListener(this);
-        placeListButton.setOnClickListener(this);
-        profileButton.setOnClickListener(this);
-
         setupFragments();
     }
 
@@ -211,13 +160,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAdapter = new ViewPagerAdapter(getSupportFragmentManager(),fList);
         viewPager.setPagingEnabled(false);
         viewPager.setAdapter(mAdapter);
+        for (int i = 0; i < 5; i++) {
+            tabLayout.addTab(tabLayout.newTab().setIcon(imageResId[i]));
+        }
+        viewPager.addOnPageChangeListener(new MyPageScrollListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new MyOnTabSelectedListener());
     }
 
     void setupProfileData(){
         localProfile = new Gson().fromJson(SettingsUtil.get(getApplicationContext(), AppPrefs.USER_KEY,""),LocalProfile.class);
 
     }
-
 
     void setUpNavigationDrawer() {
         DrawerImageLoader.init(new AbstractDrawerImageLoader() {
@@ -266,50 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         result.getRecyclerView().setVerticalScrollBarEnabled(false);
     }
 
-
-    void locationChecker(){
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(30 * 1000);
-        locationRequest.setFastestInterval(5 * 1000);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true);
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-        result.setResultCallback(resultCallback);
-    }
-
-    ResultCallback<LocationSettingsResult> resultCallback = new ResultCallback<LocationSettingsResult>() {
-        @Override
-        public void onResult(LocationSettingsResult result) {
-            final Status status = result.getStatus();
-            final LocationSettingsStates state = result.getLocationSettingsStates();
-            switch (status.getStatusCode()) {
-                case LocationSettingsStatusCodes.SUCCESS:
-                    // All location settings are satisfied. The client can initialize location
-                    // requests here.
-                    break;
-                case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                    // Location settings are not satisfied. But could be fixed by showing the user
-                    // a dialog.
-                    try {
-                        // Show the dialog by calling startResolutionForResult(),
-                        // and check the result in onActivityResult().
-                        status.startResolutionForResult(
-                                MainActivity.this, 1000);
-                    } catch (IntentSender.SendIntentException e) {
-                        // Ignore the error.
-                    }
-                    break;
-                case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                    // Location settings are not satisfied. However, we have no way to fix the
-                    // settings so we won't show the dialog.
-                    break;
-            }
-        }
-    };
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
@@ -323,5 +232,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onConnectionSuspended(int i) {
 
+    }
+
+    private class MyPageScrollListener implements ViewPager.OnPageChangeListener {
+        private TabLayout mTabLayout;
+
+        public MyPageScrollListener(TabLayout tabLayout) {
+            this.mTabLayout = tabLayout;
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    }
+
+    private class MyOnTabSelectedListener implements TabLayout.OnTabSelectedListener {
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            int position = tab.getPosition();
+            if (viewPager.getCurrentItem() != position) {
+                viewPager.setCurrentItem(position, true);
+            }
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) {
+
+        }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) {
+
+        }
     }
 }
