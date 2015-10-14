@@ -69,6 +69,7 @@ public class PlacesFragment extends Fragment {
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mAdapter = new NearbyAdapter(getContext());
         placesList.setAdapter(mAdapter);
+        if(mCurrentLocation!=null)
         new GetPlacesAsync(getContext(),"",mCurrentLocation).execute();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

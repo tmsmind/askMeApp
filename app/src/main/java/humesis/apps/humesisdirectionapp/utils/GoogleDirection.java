@@ -59,6 +59,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import humesis.apps.humesisdirectionapp.models.DirectionInstructions;
+
 @SuppressLint("NewApi")
 public class GoogleDirection {
     public final static String MODE_DRIVING = "driving";
@@ -357,6 +359,34 @@ public class GoogleDirection {
         }
 
         return listGeopoints;
+    }
+
+    public ArrayList<DirectionInstructions> getInstructions(Document doc){
+        NodeList nl1, nl2,nl3,nl4;
+        ArrayList<DirectionInstructions> instructions = new ArrayList<>();
+        nl1 = doc.getElementsByTagName("step");
+        if (nl1.getLength() > 0) {
+            for (int i = 0; i < nl1.getLength(); i++) {
+                DirectionInstructions directionInstructions = new DirectionInstructions();
+                Node node1 = nl1.item(i);
+                nl2 = node1.getChildNodes();
+                Node htmlInstructionNode = nl2.item(getNodeIndex(nl2, "html_instructions"));
+                directionInstructions.setInstruction(htmlInstructionNode.getTextContent());
+
+                Node durationNode = nl2.item(getNodeIndex(nl2,"duration"));
+                nl3 = durationNode.getChildNodes();
+                Node durationText = nl3.item(getNodeIndex(nl3,"text"));
+                directionInstructions.setDurationText(durationText.getTextContent());
+
+                Node distanceNode = nl2.item(getNodeIndex(nl2, "distance"));
+                nl3 = distanceNode.getChildNodes();
+                Node distancetext = nl3.item(getNodeIndex(nl3, "text"));
+                directionInstructions.setDistanceText(distancetext.getTextContent());
+
+                instructions.add(directionInstructions);
+            }
+        }
+        return instructions;
     }
 
     public ArrayList<LatLng> getSection(Document doc) {

@@ -13,9 +13,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -29,6 +31,8 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -56,7 +60,9 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private ArrayList<AutocompletePrediction> mResultList = new ArrayList<>();
     private CardView pickerCard,placesCard;
     private Button pickLocation, currentLocation;
+    private ImageView back;
     Event.EventType notifyType;
+    MaterialDialog progressDialog;
 
     /**
      * Callback for results from a Places Geo Data API query that shows the first place result in
@@ -77,9 +83,8 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
             final Place place = places.get(0);
 
             Log.i("Place details received: ", "" + place.getName());
-
-            places.release();
             returnResult(place);
+
         }
     };
     /**
@@ -115,8 +120,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
 
-            Toast.makeText(getApplicationContext(), "Clicked: " + primaryText,
-                    Toast.LENGTH_SHORT).show();
+
             Log.i("Called getPlaceById to get Place details for ", placeId);
         }
     };
@@ -124,19 +128,26 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
     /**
      * Returns the list of  places nearby based on location.
-     *//*
+     */
     private ResultCallback<PlaceLikelihoodBuffer> mUpdateCurrentLocationCallback = new ResultCallback<PlaceLikelihoodBuffer>() {
+        @SuppressLint("LongLogTag")
         @Override
         public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-            for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                Log.i("PlaceLikelihoodBuffer", String.format("Place '%s' has likelihood: %g",
-                        placeLikelihood.getPlace().getName(),
-                        placeLikelihood.getLikelihood()));
+            if(progressDialog.isShowing()){
+                progressDialog.dismiss();
             }
-            likelyPlaces.release();
+            if (!likelyPlaces.getStatus().isSuccess()) {
+                // Request did not complete successfully
+                Log.e("Place query did not complete. Error: ", likelyPlaces.getStatus().toString());
+                likelyPlaces.release();
+                return;
+            }
+
+            final Place place = likelyPlaces.get(0).getPlace();
+            Log.e("Current Place is likely:", place.getName().toString());
+            returnResult(place);
         }
     };
-*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,6 +166,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         placesCard = (CardView) findViewById(R.id.places_card);
         currentLocation = (Button) findViewById(R.id.button_current_location);
         pickLocation = (Button) findViewById(R.id.button_pick_from_map);
+        back = (ImageView)findViewById(R.id.place_picker_back_button);
 
         try{
             notifyType = EventBus.getDefault().getStickyEvent(Event.class).getEventType();
@@ -195,7 +207,14 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         currentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressDialog = new MaterialDialog.Builder(PlacePickerActivity.this)
+                        .content("Acquiring current location...")
+                        .progress(true, 0)
+                        .show();
 
+                PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                        .getCurrentPlace(mGoogleApiClient, null);
+                result.setResultCallback(mUpdateCurrentLocationCallback);
             }
         });
         pickLocation.setOnClickListener(new View.OnClickListener() {
@@ -210,7 +229,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     // Hide the pick option in the UI to prevent users from starting the picker
                     // multiple times.
 
-
                 } catch (GooglePlayServicesRepairableException e) {
                     GooglePlayServicesUtil
                             .getErrorDialog(e.getConnectionStatusCode(), PlacePickerActivity.this, 0);
@@ -219,6 +237,13 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                             Toast.LENGTH_LONG)
                             .show();
                 }
+            }
+        });
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
     }
@@ -254,9 +279,10 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     }
 
     void returnResult(Place place){
+        Log.e("Returning:", place.getName().toString());
         Intent result = getIntent();
         setResult(RESULT_OK,result);
-        EventBus.getDefault().postSticky(new Event(). new PlaceEvent(notifyType, place));
+        EventBus.getDefault().postSticky(new Event().new PlaceEvent(notifyType, place));
         finish();
     }
 
@@ -291,7 +317,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     if (mAdapter != null) {
                         mAdapter.updateList(mResultList);
                     } else {
-                        mAdapter = new PlacesAdapter(getApplicationContext(), mResultList);
+                        mAdapter = new PlacesAdapter(PlacePickerActivity.this, mResultList);
                         placesListView.setAdapter(mAdapter);
                     }
                 }

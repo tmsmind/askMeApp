@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/login_gradient_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activities.MapsActivity">
+    android:orientation="vertical">
 
 
     <android.support.v7.widget.CardView
@@ -22,7 +20,7 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/icon"
+                android:id="@+id/place_picker_back_button"
                 android:layout_width="@dimen/place_picker_list_row_icon_width"
                 android:layout_height="50dp"
                 android:contentDescription="icon"
@@ -43,6 +41,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:background="@android:color/transparent"
+                android:textColorHint="@color/material_drawer_hint_text"
                 android:hint="Choose Source"
                 android:textSize="@dimen/place_picker_suggest_list_row_name"
                 android:textStyle="bold" />
@@ -88,6 +87,7 @@
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
+        android:visibility="gone"
         android:id="@+id/places_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

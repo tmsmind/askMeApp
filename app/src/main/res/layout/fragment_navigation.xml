@@ -1,68 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/login_gradient_background"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activities.MapsActivity">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.CardView
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        card_view:cardCornerRadius="2dp"
-        card_view:cardElevation="6dp">
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoOverlay="true"
+        sothree:umanoPanelHeight="68dp"
+        sothree:umanoParallaxOffset="100dp"
+        sothree:umanoScrollableView="@+id/list"
+        sothree:umanoShadowHeight="4dp">
+
+        <FrameLayout
+            android:id="@+id/login_gradient_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <fragment
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:tag="DirectionsMap" />
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                card_view:cardCornerRadius="2dp"
+                card_view:cardElevation="6dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <humesis.apps.humesisdirectionapp.utils.ui.ListItem
+                        android:id="@+id/source"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        card_view:li_desc="Set starting point"
+                        card_view:li_icon="@drawable/ic_location"
+                        card_view:li_title="" />
+
+                    <humesis.apps.humesisdirectionapp.utils.ui.ListItem
+                        android:id="@+id/dest"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        card_view:li_desc="Set destination"
+                        card_view:li_icon="@drawable/ic_location"
+                        card_view:li_title="" />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </FrameLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:background="@color/white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="false"
+            android:id="@+id/dragView">
 
-            <humesis.apps.humesisdirectionapp.utils.ui.ListItem
-                android:id="@+id/source"
-                card_view:li_title="My Location"
-                card_view:li_desc="Current Location"
-                card_view:li_icon="@drawable/ic_location"
+            <android.support.v7.widget.CardView
+                android:id="@+id/route_info_card"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="68dp">
 
-            <humesis.apps.humesisdirectionapp.utils.ui.ListItem
-                android:id="@+id/dest"
-                card_view:li_title="Choose Destination"
-                card_view:li_desc=""
-                card_view:li_icon="@drawable/ic_location"
+                <humesis.apps.humesisdirectionapp.utils.ui.ListItem
+                    android:id="@+id/route_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    card_view:li_desc="-km"
+                    card_view:li_icon="@drawable/ic_start_nav"
+                    card_view:li_title="ETA -" />
+
+            </android.support.v7.widget.CardView>
+
+            <ListView
+                android:id="@+id/list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:dividerHeight="0dp" />
 
         </LinearLayout>
-
-    </android.support.v7.widget.CardView>
-
-    <fragment
-        android:layout_weight="1"
-        android:tag="DirectionsMap"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/route_info_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        card_view:cardCornerRadius="2dp"
-        card_view:cardElevation="6dp">
-
-        <humesis.apps.humesisdirectionapp.utils.ui.ListItem
-            android:id="@+id/route_info"
-            card_view:li_title="ETA 3hrs"
-            card_view:li_desc="13km"
-            card_view:li_icon="@drawable/ic_start_nav"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </android.support.v7.widget.CardView>
-
-</LinearLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+</RelativeLayout>

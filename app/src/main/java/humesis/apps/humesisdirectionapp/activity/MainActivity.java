@@ -23,6 +23,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -180,13 +181,21 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("Maps"),
+                        new PrimaryDrawerItem().withName("Select Car"),
+                        new PrimaryDrawerItem().withName("Get Directions"),
                         new PrimaryDrawerItem().withName("Places Nearby"),
+                        new DividerDrawerItem(),
                         new PrimaryDrawerItem().withName("Help"),
                         new PrimaryDrawerItem().withName("Settings"))
                 .withSelectedItem(0)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        try{
+                            tabLayout.getTabAt(position - 1).select();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         return false;
                     }
                 })
@@ -209,6 +218,24 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
     @Override
     public void onConnectionSuspended(int i) {
 
+    }
+
+    void updateFragmentAndTitle(int position){
+        if (viewPager.getCurrentItem() != position) {
+            viewPager.setCurrentItem(position, true);
+            switch (position){
+                case 0: getSupportActionBar().setTitle("Maps");
+                    break;
+                case 1: getSupportActionBar().setTitle("Select Car");
+                    break;
+                case 2: getSupportActionBar().setTitle("Get Direction");
+                    break;
+                case 3: getSupportActionBar().setTitle("Nearby Places");
+                    break;
+                case 4: getSupportActionBar().setTitle("Profile");
+                    break;
+            }
+        }
     }
 
     private class MyPageScrollListener implements ViewPager.OnPageChangeListener {
@@ -238,9 +265,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
             int position = tab.getPosition();
-            if (viewPager.getCurrentItem() != position) {
-                viewPager.setCurrentItem(position, true);
-            }
+            updateFragmentAndTitle(position);
         }
 
         @Override

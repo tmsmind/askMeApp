@@ -12,7 +12,13 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Toast;
 
+import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,12 +27,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.w3c.dom.Document;
+
+import java.util.Arrays;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import humesis.apps.humesisdirectionapp.R;
 import humesis.apps.humesisdirectionapp.activity.PlacePickerActivity;
+import humesis.apps.humesisdirectionapp.adapters.DirectionsAdapter;
 import humesis.apps.humesisdirectionapp.models.Event;
 import humesis.apps.humesisdirectionapp.preferences.AppPrefs;
 import humesis.apps.humesisdirectionapp.utils.GoogleDirection;
@@ -44,7 +55,10 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
     private GoogleDirection googleDirection;
     CardView routeInfoCard;
     private GoogleMap mMap;
-
+    SlidingUpPanelLayout bottomSheet;
+    LinearLayout dragView;
+    ListView directionLists;
+    DirectionsAdapter directionsAdapter;
     public NavigationFragment() {
     }
 
@@ -57,33 +71,42 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(false);
-        EventBus.getDefault().register(this);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.e("Navigation Fragment", "onDestroy");
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().registerSticky(this);
+    }
+
+    @Override
+    public void onStop() {
         EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     public void onEvent(Event.PlaceEvent event){
-        Log.e("Event Recieved", event.getPlace().getName().toString());
-        switch (event.getEventType()){
-            case SOURCE_PICKED:
-                source = event.getPlace();
-                sourceItem.setTitle(source.getName().toString());
-                sourceItem.setSubTitle(source.getAddress().toString());
-                srcPicked = true;
-                getRouteInfo();
-                break;
-            case DEST_PICKED:
-                dest = event.getPlace();
-                destItem.setTitle(dest.getName().toString());
-                destItem.setSubTitle(dest.getAddress().toString());
-                destPicked = true;
-                getRouteInfo();
-                break;
+        try {
+            Log.e("Event Recieved", event.getPlace().getName().toString());
+            switch (event.getEventType()) {
+                case SOURCE_PICKED:
+                    source = event.getPlace();
+                    sourceItem.setTitle(source.getName().toString());
+                    sourceItem.setSubTitle(source.getAddress().toString());
+                    srcPicked = true;
+                    getRouteInfo();
+                    break;
+                case DEST_PICKED:
+                    dest = event.getPlace();
+                    destItem.setTitle(dest.getName().toString());
+                    destItem.setSubTitle(dest.getAddress().toString());
+                    destPicked = true;
+                    getRouteInfo();
+                    break;
+            }
+        }catch (Exception e){
+            Toast.makeText(getContext(),"Error getting location data, try again later",Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
     }
     @Nullable
@@ -109,6 +132,11 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         destItem = (ListItem) view.findViewById(R.id.dest);
         routeInfo = (ListItem) view.findViewById(R.id.route_info);
         routeInfoCard = (CardView) view.findViewById(R.id.route_info_card);
+        bottomSheet = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_layout);
+        dragView = (LinearLayout) view.findViewById(R.id.dragView);
+        directionLists = (ListView) view.findViewById(R.id.list);
+
+        bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentByTag("DirectionsMap");
         if (mapFragment!=null)
@@ -116,6 +144,35 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
 
         sourceItem.setOnClickListener(this);
         destItem.setOnClickListener(this);
+
+        bottomSheet.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                Log.i("onPanelSlide, offset ", "" + slideOffset);
+            }
+
+            @Override
+            public void onPanelExpanded(View panel) {
+                Log.i("onPanelExpanded", "");
+
+            }
+
+            @Override
+            public void onPanelCollapsed(View panel) {
+                Log.i("", "onPanelCollapsed");
+
+            }
+
+            @Override
+            public void onPanelAnchored(View panel) {
+                Log.i("", "onPanelAnchored");
+            }
+
+            @Override
+            public void onPanelHidden(View panel) {
+                Log.i("", "onPanelHidden");
+            }
+        });
     }
 
     @Override
@@ -127,7 +184,7 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
                 break;
 
             case R.id.dest:
-                openPlacePicker(Event.EventType.DEST_PICKED,AppPrefs.DEST_PICKED);
+                 openPlacePicker(Event.EventType.DEST_PICKED,AppPrefs.DEST_PICKED);
                 break;
         }
     }
@@ -163,6 +220,7 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onResponse(String status, Document doc, GoogleDirection gd) {
+
         routeInfoCard.setVisibility(View.VISIBLE);
         routeInfo.setTitle("ETA " + gd.getTotalDurationText(doc));
         routeInfo.setSubTitle("Approx " + gd.getTotalDistanceText(doc));
@@ -170,6 +228,15 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         mMap.addMarker(new MarkerOptions().title(source.getName().toString()).position(source.getLatLng()));
         mMap.addMarker(new MarkerOptions().title(dest.getName().toString()).position(dest.getLatLng()));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        if(directionsAdapter==null){
+            directionsAdapter = new DirectionsAdapter(getContext(),gd.getInstructions(doc));
+            directionLists.setAdapter(directionsAdapter);
+        }else{
+            directionsAdapter.updateList(gd.getInstructions(doc));
+        }
+
+        Log.e("Instrcutions",gd.getInstructions(doc).toString());
     }
 
     @Override

@@ -19,10 +19,6 @@
         <item name="android:background">@color/primary</item>
     </style>
 
-    <style name="MyEditTextTheme" parent="Theme.AppCompat.Light">
-        <item name="android:editTextStyle">@android:style/Widget.EditText</item>
-    </style>
-
     <style name="FullScreen" parent="Theme.AppCompat.Light.NoActionBar"/>
 
     <style name="PlacePickerCard">

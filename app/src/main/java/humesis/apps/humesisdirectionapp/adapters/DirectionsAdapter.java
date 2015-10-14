@@ -1,10 +1,7 @@
 package humesis.apps.humesisdirectionapp.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.text.style.CharacterStyle;
-import android.text.style.StyleSpan;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,30 +9,30 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.location.places.AutocompletePrediction;
 import com.squareup.picasso.Picasso;
 
 import java.util.Collections;
 import java.util.List;
 
 import humesis.apps.humesisdirectionapp.R;
+import humesis.apps.humesisdirectionapp.models.DirectionInstructions;
 import humesis.apps.humesisdirectionapp.placepicker.Place;
 
 /**
  * Created by dhanraj on 10/10/15.
  */
-public class PlacesAdapter extends BaseAdapter {
+public class DirectionsAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
-    private List<AutocompletePrediction> mSuggestedPlaces;
+    private List<DirectionInstructions> mSuggestedPlaces;
     private Context mContext;
-    private static final CharacterStyle STYLE_BOLD = new StyleSpan(Typeface.BOLD);
 
-    public PlacesAdapter(Context context) {
+
+    public DirectionsAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
         mSuggestedPlaces = Collections.emptyList();
     }
 
-    public PlacesAdapter(Context context, List<AutocompletePrediction> mSuggestedPlaces) {
+    public DirectionsAdapter(Context context, List<DirectionInstructions> mSuggestedPlaces) {
         mInflater = LayoutInflater.from(context);
         this.mSuggestedPlaces = mSuggestedPlaces;
         mContext = context;
@@ -47,7 +44,7 @@ public class PlacesAdapter extends BaseAdapter {
     }
 
     @Override
-    public AutocompletePrediction getItem(int position) {
+    public Object getItem(int position) {
         return mSuggestedPlaces.get(position);
     }
 
@@ -60,10 +57,10 @@ public class PlacesAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         ViewHolder holder;
-        AutocompletePrediction placeInfo = mSuggestedPlaces.get(position);
+        DirectionInstructions placeInfo = mSuggestedPlaces.get(position);
 
         if (convertView == null) {
-            view = mInflater.inflate(R.layout.listview_row, parent, false);
+            view = mInflater.inflate(R.layout.listview_row_card, parent, false);
             holder = new ViewHolder();
             holder.icon = (ImageView) view.findViewById(R.id.icon);
             holder.name = (TextView) view.findViewById(R.id.name);
@@ -73,10 +70,9 @@ public class PlacesAdapter extends BaseAdapter {
             view = convertView;
             holder = (ViewHolder) view.getTag();
         }
-        holder.name.setTextColor(Color.BLACK);
-        holder.description.setTextColor(Color.BLACK);
-        holder.name.setText(placeInfo.getPrimaryText(STYLE_BOLD));
-        holder.description.setText(placeInfo.getSecondaryText(STYLE_BOLD));
+
+        holder.name.setText(Html.fromHtml(placeInfo.getInstruction()));
+        holder.description.setText("in " + placeInfo.getDurationText() + "(" + placeInfo.getDistanceText() + ")");
 
         return view;
     }
@@ -86,7 +82,7 @@ public class PlacesAdapter extends BaseAdapter {
         public TextView name, description;
     }
 
-    public void updateList(List<AutocompletePrediction> list) {
+    public void updateList(List<DirectionInstructions> list) {
         mSuggestedPlaces = list;
         notifyDataSetChanged();
     }
