@@ -12,12 +12,15 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,7 +30,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.maps.Overlay;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -35,17 +38,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import humesis.apps.humesisdirectionapp.R;
-import humesis.apps.humesisdirectionapp.models.MapOverlayItem;
+import humesis.apps.humesisdirectionapp.adapters.NearbyAdapter;
 import humesis.apps.humesisdirectionapp.placepicker.Place;
 import humesis.apps.humesisdirectionapp.placepicker.PlacesService;
 import humesis.apps.humesisdirectionapp.preferences.AppPrefs;
 import humesis.apps.humesisdirectionapp.preferences.SettingsUtil;
-import humesis.apps.humesisdirectionapp.utils.GoogleDirection;
+import humesis.apps.humesisdirectionapp.utils.ui.ListItem;
 
 /**
  * Created by dhanraj on 08/10/15.
  */
-public class MapFragment extends SupportMapFragment implements OnMapReadyCallback, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener {
+
+    private static View rootView;
+    SlidingUpPanelLayout bottomSheet;
+    ListItem placeInfo;
+    private GoogleMap mMap;
+    LocationManager mLocationManager;
+    ListView placesList;
+    NearbyAdapter mAdapter;
+    ArrayList<Place> nearbyPlaces = new ArrayList<>();
 
     public MapFragment() {
     }
@@ -54,8 +66,6 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         return new MapFragment();
     }
 
-    private GoogleMap mMap;
-    LocationManager mLocationManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,12 +73,69 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         setHasOptionsMenu(true);
     }
 
+    @Nullable
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (rootView != null) {
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (parent != null)
+                parent.removeView(rootView);
+        }
+        try {
+            rootView = inflater.inflate(R.layout.fragment_map, container, false);
+        } catch (InflateException e) {
+        /* map is already there, just return view as it is  */
+        }
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        placeInfo = (ListItem) view.findViewById(R.id.place_info);
+        bottomSheet = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_layout);
+        placesList = (ListView) view.findViewById(R.id.place_list);
+
+        bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+
+        if (mAdapter == null) {
+            mAdapter = new NearbyAdapter(getContext());
+            placesList.setAdapter(mAdapter);
+        }
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.main_map);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this);
 
 
-        getMapAsync(this);
+        bottomSheet.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                Log.i("onPanelSlide, offset ", "" + slideOffset);
+            }
+
+            @Override
+            public void onPanelExpanded(View panel) {
+                Log.i("onPanelExpanded", "");
+
+            }
+
+            @Override
+            public void onPanelCollapsed(View panel) {
+                Log.i("", "onPanelCollapsed");
+
+            }
+
+            @Override
+            public void onPanelAnchored(View panel) {
+                Log.i("", "onPanelAnchored");
+            }
+
+            @Override
+            public void onPanelHidden(View panel) {
+                Log.i("", "onPanelHidden");
+            }
+        });
     }
 
 
@@ -103,16 +170,23 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        switch (id){
+        Location location = humesis.apps.humesisdirectionapp.utils.LocationManager.getLastKnownLocation(getContext());
+        switch (id) {
             case R.id.action_show_gas_station:
                 mMap.clear();
-                Log.e("Getting Place","Gas Station");
-                new GetPlacesAsync(getContext(),"gas_station",getLastKnownLocation()).execute();
+                Log.e("Getting Place", "Gas Station");
+                if (location != null)
+                    new GetPlacesAsync(getContext(), "gas_station", location).execute();
+                else
+                    Toast.makeText(getContext(), "Unable to get location", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_show_restaurents:
                 mMap.clear();
                 Log.e("Getting Place", "Restaurants");
-                new GetPlacesAsync(getContext(), "cafe", getLastKnownLocation()).execute();
+                if (location != null)
+                    new GetPlacesAsync(getContext(), "cafe", location).execute();
+                else
+                    Toast.makeText(getContext(), "Unable to get location", Toast.LENGTH_SHORT).show();
                 return true;
 
             default:
@@ -200,7 +274,7 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
                     location.getLongitude(), places);
             Log.e("Nearby Places ::", places);
 
-            for(Place place:findPlaces){
+            for (Place place : findPlaces) {
                 try {
                     place.setBitmapIcon(Picasso.with(context).load(place.getIcon()).get());
                 } catch (IOException e) {
@@ -214,15 +288,16 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         @Override
         protected void onPostExecute(ArrayList<Place> result) {
             super.onPostExecute(result);
-            if(mMap!=null)
-            for (Place place:result) {
+            nearbyPlaces = result;
+            if (mMap != null)
+                for (Place place : result) {
                     mMap.addMarker(new MarkerOptions()
                             .title(place.getName())
                             .position(
                                     new LatLng(place.getLatitude(), place.getLongitude()))
                             .icon(BitmapDescriptorFactory.fromBitmap(place.getBitmapIcon()))
                             .snippet(place.getVicinity()));
-            }
+                }
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(result.get(0).getLatitude(), result
                             .get(0).getLongitude())) // Sets the center of the map to
@@ -232,6 +307,17 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
                     .build(); // Creates a CameraPosition from the builder
             mMap.animateCamera(CameraUpdateFactory
                     .newCameraPosition(cameraPosition));
+
+            if (places.contentEquals("cafe")) {
+                placeInfo.setIcon(R.drawable.ic_local_restaurant_red_500_24dp);
+                placeInfo.setTitle("Found " + result.size() + " eateries near you");
+            } else if (places.contentEquals("gas_station")) {
+                placeInfo.setIcon(R.drawable.ic_local_gas_station_red_500_24dp);
+                placeInfo.setTitle("Found " + result.size() + " Gas stations near you");
+            }
+            mAdapter.updateList(result);
+            bottomSheet.setAnchorPoint(0.5f);
+            bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
     }
 }

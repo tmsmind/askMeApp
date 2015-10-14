@@ -235,8 +235,6 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         }else{
             directionsAdapter.updateList(gd.getInstructions(doc));
         }
-
-        Log.e("Instrcutions",gd.getInstructions(doc).toString());
     }
 
     @Override
