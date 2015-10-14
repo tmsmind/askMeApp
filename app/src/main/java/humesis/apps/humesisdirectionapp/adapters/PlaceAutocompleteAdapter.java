@@ -245,6 +245,4 @@ public class PlaceAutocompleteAdapter
         public ImageView icon;
         public TextView name, description;
     }
-
-
 }

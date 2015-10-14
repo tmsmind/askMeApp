@@ -6,4 +6,10 @@
         <attr name="tab_indicator_enabled" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="ListItem">
+        <attr name="li_title" format="string"/>
+        <attr name="li_desc" format="string"/>
+        <attr name="li_icon" format="reference"/>
+    </declare-styleable>
+
 </resources>

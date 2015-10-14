@@ -23,5 +23,6 @@ public class MyApplication extends Application {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
         FacebookSdk.sdkInitialize(getApplicationContext());
+        // TODO: Get cities between source and dest. Time can be specified by user (2-3 hours).
     }
 }

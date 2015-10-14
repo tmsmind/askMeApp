@@ -55,7 +55,9 @@ public class LoginActivity extends AppCompatActivity {
         isFBLoggedIn();
         isTwitterLoggedIn();
 
-
+        /**
+         * Facebook callback
+         */
         loginButtonFB.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -76,6 +78,9 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         * Twitter Callback
+         */
         loginButtonTW.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {

@@ -1,15 +1,7 @@
 package humesis.apps.humesisdirectionapp.activity;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -18,30 +10,14 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
-import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.gson.Gson;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -57,7 +33,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
 import humesis.apps.humesisdirectionapp.R;
 import humesis.apps.humesisdirectionapp.adapters.ViewPagerAdapter;
 import humesis.apps.humesisdirectionapp.fragments.CarsFragment;
@@ -65,11 +40,9 @@ import humesis.apps.humesisdirectionapp.fragments.NavigationFragment;
 import humesis.apps.humesisdirectionapp.fragments.MapFragment;
 import humesis.apps.humesisdirectionapp.fragments.PlacesFragment;
 import humesis.apps.humesisdirectionapp.models.LocalProfile;
-import humesis.apps.humesisdirectionapp.models.NotifyEvent;
 import humesis.apps.humesisdirectionapp.preferences.AppPrefs;
 import humesis.apps.humesisdirectionapp.preferences.SettingsUtil;
 import humesis.apps.humesisdirectionapp.utils.ui.MyViewPager;
-import humesis.apps.humesisdirectionapp.utils.ui.TabButtons;
 
 /**
  * Created by dhanraj on 08/10/15.
@@ -114,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+
         humesis.apps.humesisdirectionapp.utils.LocationManager.locationChecker(mGoogleApiClient,MainActivity.this);
         setupProfileData();
         setUpNavigationDrawer();
@@ -159,11 +133,14 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         fList.add(PlacesFragment.newInstance());
         mAdapter = new ViewPagerAdapter(getSupportFragmentManager(),fList);
         viewPager.setPagingEnabled(false);
-        viewPager.setAdapter(mAdapter);
+        viewPager.setAdapter(mAdapter); //binding the fragments to the view
+
         for (int i = 0; i < 5; i++) {
             tabLayout.addTab(tabLayout.newTab().setIcon(imageResId[i]));
         }
+
         viewPager.addOnPageChangeListener(new MyPageScrollListener(tabLayout));
+
         tabLayout.setOnTabSelectedListener(new MyOnTabSelectedListener());
     }
 

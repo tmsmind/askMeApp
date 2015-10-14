@@ -1,17 +1,19 @@
 package humesis.apps.humesisdirectionapp.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,50 +21,47 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.data.DataBufferUtils;
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
-import org.w3c.dom.Document;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import java.util.ArrayList;
 
 import de.greenrobot.event.EventBus;
 import humesis.apps.humesisdirectionapp.R;
-import humesis.apps.humesisdirectionapp.adapters.PlaceAutocompleteAdapter;
-import humesis.apps.humesisdirectionapp.models.NotifyEvent;
-import humesis.apps.humesisdirectionapp.placepicker.PlacesService;
+import humesis.apps.humesisdirectionapp.adapters.PlacesAdapter;
+import humesis.apps.humesisdirectionapp.models.Event;
 import humesis.apps.humesisdirectionapp.preferences.AppPrefs;
-import humesis.apps.humesisdirectionapp.utils.GoogleDirection;
+import humesis.apps.humesisdirectionapp.utils.LocationManager;
+import humesis.apps.humesisdirectionapp.utils.placesapi.Utils;
 
 
 /**
  * Created by dhanraj on 10/10/15.
  */
-public class PlacePickerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, OnMapReadyCallback, GoogleMap.OnCameraChangeListener, GoogleMap.OnMyLocationChangeListener, GoogleDirection.OnDirectionResponseListener {
+public class PlacePickerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
-    private PlaceAutocompleteAdapter mAdapter;
+    private PlacesAdapter mAdapter;
     private GoogleApiClient mGoogleApiClient;
-    private AutoCompleteTextView searchText;
-    private GoogleMap mMap;
-    private GoogleDirection googleDirection;
-    private LatLng center;
+    private EditText searchText;
+    private ListView placesListView;
+    private ArrayList<AutocompletePrediction> mResultList = new ArrayList<>();
+    private CardView pickerCard,placesCard;
+    private Button pickLocation, currentLocation;
+    Event.EventType notifyType;
 
-    TextView placeName, placeAddress;
-
-   /* *//**
+    /**
      * Callback for results from a Places Geo Data API query that shows the first place result in
      * the details view on screen.
-     *//*
+     */
     private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
             = new ResultCallback<PlaceBuffer>() {
         @SuppressLint("LongLogTag")
@@ -80,9 +79,10 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
             Log.i("Place details received: ", "" + place.getName());
 
             places.release();
+            returnResult(place);
         }
     };
-    *//**
+    /**
      * Listener that handles selections from suggestions from the AutoCompleteTextView that
      * displays Place suggestions.
      * Gets the place id of the selected item and issues a request to the Places Geo Data API
@@ -90,27 +90,27 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
      *
      * @see com.google.android.gms.location.places.GeoDataApi#getPlaceById(com.google.android.gms.common.api.GoogleApiClient,
      * String...)
-     *//*
+     */
     private AdapterView.OnItemClickListener mAutocompleteClickListener
             = new AdapterView.OnItemClickListener() {
         @SuppressLint("LongLogTag")
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            *//*
+            /*
              Retrieve the place ID of the selected item from the Adapter.
              The adapter stores each Place suggestion in a AutocompletePrediction from which we
              read the place ID and title.
-              *//*
+              */
             final AutocompletePrediction item = mAdapter.getItem(position);
             final String placeId = item.getPlaceId();
             final CharSequence primaryText = item.getPrimaryText(null);
 
             Log.i("Autocomplete item selected: ", primaryText.toString());
 
-            *//*
+            /*
              Issue a request to the Places Geo Data API to retrieve a Place object with additional
              details about the place.
-              *//*
+              */
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
@@ -121,7 +121,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         }
     };
 
-    */
 
     /**
      * Returns the list of  places nearby based on location.
@@ -141,7 +140,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_place_picker);
+        setContentView(R.layout.activity_place_picker);
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .enableAutoManage(this, 34995, this)
@@ -150,18 +149,94 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+        searchText = (EditText) findViewById(R.id.place_picker_search);
+        placesListView = (ListView) findViewById(R.id.places_list_view);
+        pickerCard = (CardView) findViewById(R.id.picker_card);
+        placesCard = (CardView) findViewById(R.id.places_card);
+        currentLocation = (Button) findViewById(R.id.button_current_location);
+        pickLocation = (Button) findViewById(R.id.button_pick_from_map);
 
-        /*searchText.setOnItemClickListener(mAutocompleteClickListener);
-        mAdapter = new PlaceAutocompleteAdapter(getApplicationContext(), mGoogleApiClient, Utils.setBounds(humesis.apps.humesisdirectionapp.utils.LocationManager.getLastKnownLocation(this), 500),
-                null);
-        searchText.setAdapter(mAdapter);*/
+        try{
+            notifyType = EventBus.getDefault().getStickyEvent(Event.class).getEventType();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
-//        placeName = (TextView) findViewById(R.id.name);
-//        placeAddress = (TextView) findViewById(R.id.description);
-//
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
+        searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                if (count > 2) {
+                    pickerCard.setVisibility(View.GONE);
+                    placesCard.setVisibility(View.VISIBLE);
+                    getAutocomplete(charSequence, Utils.setBounds(LocationManager.getLastKnownLocation(getApplicationContext()), 100));
+                }else {
+                    pickerCard.setVisibility(View.VISIBLE);
+                    placesCard.setVisibility(View.GONE);
+                    mResultList = new ArrayList<>();
+                    if (mAdapter != null) {
+                        mAdapter.updateList(mResultList);
+                    } else {
+                        mAdapter = new PlacesAdapter(getApplicationContext(), mResultList);
+                        placesListView.setAdapter(mAdapter);
+                    }
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        placesListView.setOnItemClickListener(mAutocompleteClickListener);
+        currentLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        pickLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+                    Intent intent = intentBuilder.build(getApplicationContext());
+                    // Start the Intent by requesting a result, identified by a request code.
+                    startActivityForResult(intent, AppPrefs.PLACE_PICKER);
+
+                    // Hide the pick option in the UI to prevent users from starting the picker
+                    // multiple times.
+
+
+                } catch (GooglePlayServicesRepairableException e) {
+                    GooglePlayServicesUtil
+                            .getErrorDialog(e.getConnectionStatusCode(), PlacePickerActivity.this, 0);
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Toast.makeText(getApplicationContext(), "Google Play Services is not available.",
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case AppPrefs.PLACE_PICKER:
+                if (resultCode == Activity.RESULT_OK) {
+                    final Place place = PlacePicker.getPlace(data, getApplicationContext());
+                    Log.e("Place Picked", place.getName().toString());
+                    returnResult(place);
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode,resultCode,data);
+                break;
+        }
     }
 
     @Override
@@ -171,37 +246,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnected(Bundle bundle) {
-        try {
-            PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-            Intent intent = intentBuilder.build(this);
-            // Start the Intent by requesting a result, identified by a request code.
-            startActivityForResult(intent, AppPrefs.PLACE_PICKER);
-
-            // Hide the pick option in the UI to prevent users from starting the picker
-            // multiple times.
-
-
-        } catch (GooglePlayServicesRepairableException e) {
-            GooglePlayServicesUtil
-                    .getErrorDialog(e.getConnectionStatusCode(), this, 0);
-        } catch (GooglePlayServicesNotAvailableException e) {
-            Toast.makeText(PlacePickerActivity.this, "Google Play Services is not available.",
-                    Toast.LENGTH_LONG)
-                    .show();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case AppPrefs.PLACE_PICKER:
-                if (resultCode == Activity.RESULT_OK) {
-                    final Place place = PlacePicker.getPlace(data, this);
-                    final CharSequence name = place.getName();
-                    EventBus.getDefault().post(new NotifyEvent(NotifyEvent.NotifyType.PLACE_PICKED, (String) name));
-                }
-                finish();
-        }
     }
 
     @Override
@@ -209,101 +253,50 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        zoomToLocation(humesis.apps.humesisdirectionapp.utils.LocationManager.getLastKnownLocation(this));
-        mMap.setOnMyLocationChangeListener(this);
-        mMap.setMyLocationEnabled(true);
-        mMap.setOnCameraChangeListener(this);
-        googleDirection = new GoogleDirection(this);
-        googleDirection.setOnDirectionResponseListener(this);
+    void returnResult(Place place){
+        Intent result = getIntent();
+        setResult(RESULT_OK,result);
+        EventBus.getDefault().postSticky(new Event(). new PlaceEvent(notifyType, place));
+        finish();
     }
 
-    void zoomToLocation(Location location) {
-        if (location != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(location.getLatitude(), location.getLongitude()), 13));
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                    .zoom(17)                   // Sets the zoom
-                    .bearing(90)                // Sets the orientation of the camera to east
-                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+    @SuppressLint("LongLogTag")
+    private void getAutocomplete(CharSequence constraint,LatLngBounds mBounds) {
+        if (mGoogleApiClient.isConnected()) {
+            Log.i("Starting autocomplete: ", constraint.toString());
+
+            // Submit the query to the autocomplete API and retrieve a PendingResult that will
+            // contain the results when the query completes.
+            PendingResult<AutocompletePredictionBuffer> results =
+                    Places.GeoDataApi
+                            .getAutocompletePredictions(mGoogleApiClient, constraint.toString(),
+                                    mBounds, null);
+
+            results.setResultCallback(new ResultCallback<AutocompletePredictionBuffer>() {
+                @Override
+                public void onResult(AutocompletePredictionBuffer autocompletePredictions) {
+                    final Status status = autocompletePredictions.getStatus();
+                    if (!status.isSuccess()) {
+                        Toast.makeText(getApplicationContext(), "Error contacting API: " + status.toString(),
+                                Toast.LENGTH_SHORT).show();
+                        Log.e("Error getting prediction API call:", status.toString());
+                        autocompletePredictions.release();
+                    }
+
+                    Log.i("Query completed. Received ", autocompletePredictions.getCount()
+                            + " predictions.");
+                    // Freeze the results immutable representation that can be stored safely.
+                   mResultList=  DataBufferUtils.freezeAndClose(autocompletePredictions);
+                    if (mAdapter != null) {
+                        mAdapter.updateList(mResultList);
+                    } else {
+                        mAdapter = new PlacesAdapter(getApplicationContext(), mResultList);
+                        placesListView.setAdapter(mAdapter);
+                    }
+                }
+            });
         }
+        Log.e("TAG", "Google API client is not connected for autocomplete query.");
     }
-
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-        center = mMap.getCameraPosition().target;
-        try {
-            new GetLocationAsync(center.latitude, center.longitude)
-                    .execute();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onMyLocationChange(Location location) {
-
-    }
-
-    @Override
-    public void onResponse(String status, Document doc, GoogleDirection gd) {
-        mMap.addPolyline(gd.getPolyline(doc, 3, Color.parseColor("3F51B5")));
-    }
-
-    private class GetLocationAsync extends AsyncTask<String, Void, List<Address>> {
-
-        // boolean duplicateResponse;
-        double x, y;
-        String str;
-        private Geocoder geocoder;
-
-        boolean isStart;
-        private List<Address> addresses;
-
-        public GetLocationAsync(double latitude, double longitude) {
-            // TODO Auto-generated constructor stub
-
-            x = latitude;
-            y = longitude;
-        }
-
-
-        @Override
-        protected void onPreExecute() {
-            placeName.setText(" Getting location ");
-            placeAddress.setText("");
-        }
-
-        @Override
-        protected List<Address> doInBackground(String... params) {
-
-            try {
-                geocoder = new Geocoder(getApplicationContext(), Locale.ENGLISH);
-                addresses = geocoder.getFromLocation(x, y, 1);
-            } catch (IOException e) {
-                Log.e("tag", e.getMessage());
-            }
-            str = new PlacesService(getResources().getString(R.string.google_maps_key)).reverseGeocode(x,y);
-            return addresses;
-
-        }
-
-        /**
-         * @param result
-         */
-        @Override
-        protected void onPostExecute(List<Address> result) {
-            Address returnAddress = result.get(0);
-            Log.e("Address",str);
-            placeName.setText(returnAddress.getFeatureName());
-            placeAddress.setText(returnAddress.getAddressLine(0));
-        }
-    }
-
 }

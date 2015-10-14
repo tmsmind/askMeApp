@@ -48,7 +48,7 @@ dependencies {
     compile 'com.squareup.okio:okio:1.6.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile('com.mikepenz:materialdrawer:4.3.4@aar') {
+    compile('com.mikepenz:materialdrawer:4.3.4@aar') { //side drawer for android
         transitive = true
     }
     compile 'com.facebook.android:facebook-android-sdk:4.7.0'

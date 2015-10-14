@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/login_gradient_background"
@@ -10,29 +10,98 @@
     tools:context=".activities.MapsActivity">
 
 
-    <fragment xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <include layout="@layout/listview_row_card" />
-
-
-    <LinearLayout
-        android:id="@+id/locationMarker"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="30dp"
-        android:gravity="center"
-        android:orientation="vertical">
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="2dp">
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_location" />
-    </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-</FrameLayout>
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="@dimen/place_picker_list_row_icon_width"
+                android:layout_height="50dp"
+                android:contentDescription="icon"
+                android:paddingBottom="10dp"
+                android:paddingEnd="20dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="20dp"
+                android:paddingStart="10dp"
+                android:paddingTop="10dp"
+                android:src="@drawable/ic_arrow_back" />
+
+            <EditText
+                android:gravity="center_vertical"
+                android:id="@+id/place_picker_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:background="@android:color/transparent"
+                android:hint="Choose Source"
+                android:textSize="@dimen/place_picker_suggest_list_row_name"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/picker_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="2dp"
+        android:layout_margin="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/button_pick_from_map"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_location"
+                android:text="Pick from map" />
+
+            <Button
+                android:id="@+id/button_current_location"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_my_location_red"
+                android:text="My Location" />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/places_card"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        card_view:cardCornerRadius="2dp"
+        android:layout_margin="2dp">
+
+        <ListView
+            android:id="@+id/places_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:dividerHeight="0dp"
+            android:divider="@null"
+            android:layout_marginBottom="5dp" />
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

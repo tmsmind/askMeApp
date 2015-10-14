@@ -59,6 +59,11 @@ public class LocationManager {
         return bestLocation;
     }
 
+    /**
+     * Prompt user to enable GPS and Location Services
+     * @param mGoogleApiClient
+     * @param activity
+     */
     public static void locationChecker(GoogleApiClient mGoogleApiClient, final Activity activity) {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
