@@ -20,6 +20,7 @@ public class ListItem extends LinearLayout {
     @DrawableRes int icon;
     TextView titleTV,subTitleTV;
     ImageView iconIV;
+    boolean showIcon;
 
     public ListItem(Context context) {
         super(context);
@@ -36,6 +37,7 @@ public class ListItem extends LinearLayout {
         icon = a.getResourceId(R.styleable.ListItem_li_icon, R.drawable.ic_person);
         title = a.getString(R.styleable.ListItem_li_title);
         subTitle = a.getString(R.styleable.ListItem_li_desc);
+        showIcon = a.getBoolean(R.styleable.ListItem_li_show_icon,true);
 
         a.recycle();
     }
@@ -51,6 +53,7 @@ public class ListItem extends LinearLayout {
         iconIV.setImageResource(icon);
         titleTV.setText(title);
         subTitleTV.setText(subTitle);
+        iconIV.setVisibility(showIcon ? VISIBLE : GONE);
     }
 
     public void setTitle(String title){
@@ -66,6 +69,15 @@ public class ListItem extends LinearLayout {
     public void setIcon(@DrawableRes int icon){
         iconIV.setImageResource(icon);
         invalidate();
+    }
+
+    public void setShowIcon(boolean showIcon){
+        iconIV.setVisibility(showIcon?VISIBLE:GONE);
+        invalidate();
+    }
+
+    public ImageView getIconIV(){
+        return iconIV;
     }
 
 }

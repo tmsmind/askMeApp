@@ -10,6 +10,20 @@
         <attr name="li_title" format="string"/>
         <attr name="li_desc" format="string"/>
         <attr name="li_icon" format="reference"/>
+        <attr name="li_show_icon" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="ProfileHeader">
+        <attr name="ph_cover_image" format="reference"/>
+        <attr name="ph_profile_image" format="reference"/>
+        <attr name="ph_profile_name" format="string"/>
+        <attr name="ph_profile_email" format="string"/>
+    </declare-styleable>
+    <declare-styleable name="CircleImageView">
+        <attr name="border_width" format="dimension" />
+        <attr name="border_color" format="color" />
+    </declare-styleable>
+
+
 
 </resources>

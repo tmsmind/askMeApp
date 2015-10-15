@@ -5,20 +5,23 @@ package humesis.apps.humesisdirectionapp.models;
  */
 public class LocalProfile {
 
-    String name;
-    String profilePic;
-    String email;
+    public String name;
+    public String profilePic;
+    public String email;
+    public String coverPic;
 
     public LocalProfile() {
         this.name = "";
         this.profilePic = "";
         this.email = "";
+        this.coverPic = "";
     }
 
-    public LocalProfile(String name, String profilePic, String email) {
+    public LocalProfile(String name, String profilePic, String email, String coverPic) {
         this.name = name;
         this.profilePic = profilePic;
         this.email = email;
+        this.coverPic = coverPic;
     }
 
     public String getName() {
@@ -43,5 +46,23 @@ public class LocalProfile {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getCoverPic() {
+        return coverPic;
+    }
+
+    public void setCoverPic(String coverPic) {
+        this.coverPic = coverPic;
+    }
+
+    @Override
+    public String toString() {
+        return "LocalProfile{" +
+                "name='" + name + '\'' +
+                ", profilePic='" + profilePic + '\'' +
+                ", email='" + email + '\'' +
+                ", coverPic='" + coverPic + '\'' +
+                '}';
     }
 }

@@ -40,6 +40,7 @@ import humesis.apps.humesisdirectionapp.fragments.CarsFragment;
 import humesis.apps.humesisdirectionapp.fragments.NavigationFragment;
 import humesis.apps.humesisdirectionapp.fragments.MapFragment;
 import humesis.apps.humesisdirectionapp.fragments.PlacesFragment;
+import humesis.apps.humesisdirectionapp.fragments.ProfileFragment;
 import humesis.apps.humesisdirectionapp.models.LocalProfile;
 import humesis.apps.humesisdirectionapp.preferences.AppPrefs;
 import humesis.apps.humesisdirectionapp.preferences.SettingsUtil;
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
         fList.add(CarsFragment.newInstance());
         fList.add(NavigationFragment.newInstance());
         fList.add(PlacesFragment.newInstance());
+        fList.add(ProfileFragment.newInstance());
         mAdapter = new ViewPagerAdapter(getSupportFragmentManager(),fList);
         viewPager.setPagingEnabled(false);
         viewPager.setAdapter(mAdapter); //binding the fragments to the view
@@ -172,6 +174,9 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                                 .withIcon(localProfile.getProfilePic())
                 )
                 .build();
+
+        ImageView view = headerResult.getHeaderBackgroundView();
+        Picasso.with(view.getContext()).load(localProfile.coverPic).placeholder(R.drawable.header).into(view);
 
         result = new DrawerBuilder()
                 .withActivity(this)

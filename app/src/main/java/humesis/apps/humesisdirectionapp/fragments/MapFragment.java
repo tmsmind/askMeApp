@@ -157,7 +157,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mMap.setOnCameraChangeListener(this);
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -315,6 +314,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 placeInfo.setIcon(R.drawable.ic_local_gas_station_red_500_24dp);
                 placeInfo.setTitle("Found " + result.size() + " Gas stations near you");
             }
+            placeInfo.setSubTitle("");
             mAdapter.updateList(result);
             bottomSheet.setAnchorPoint(0.5f);
             bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);

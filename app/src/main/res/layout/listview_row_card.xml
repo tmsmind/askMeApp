@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="2dp"
-    card_view:cardCornerRadius="2dp">
+    card_view:cardCornerRadius="6dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -49,14 +49,6 @@
             android:maxLines="1"
             android:text="Accra, Ghana"
             android:textSize="@dimen/place_picker_suggest_list_row_description" />
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_alignBottom="@+id/icon"
-            android:layout_toEndOf="@+id/icon"
-            android:layout_toRightOf="@+id/icon"
-            android:background="#eeeeee" />
 
     </RelativeLayout>
 
