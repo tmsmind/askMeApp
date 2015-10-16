@@ -1,6 +1,7 @@
 package humesis.apps.humesisdirectionapp.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,7 +71,7 @@ public class DirectionsAdapter extends BaseAdapter {
             view = convertView;
             holder = (ViewHolder) view.getTag();
         }
-
+        holder.name.setTypeface(null, Typeface.NORMAL);
         holder.name.setText(Html.fromHtml(placeInfo.getInstruction()));
         holder.description.setText("in " + placeInfo.getDurationText() + "(" + placeInfo.getDistanceText() + ")");
 

@@ -15,8 +15,15 @@
     <style name="MyToolbarStyle" parent="Theme.AppCompat.NoActionBar">
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorPrimary">@color/white</item>
-        <item name="actionMenuTextColor">@color/Black</item>
+        <item name="android:actionMenuTextColor">@color/Black</item>
         <item name="android:background">@color/primary</item>
+    </style>
+
+    <style name="MyToolbarPopUp" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">@color/Black</item>
+        <item name="android:textColorPrimary">@color/Black</item>
+        <item name="actionMenuTextColor">@color/Black</item>
+        <item name="android:background">@color/white</item>
     </style>
 
     <style name="FullScreen" parent="Theme.AppCompat.Light.NoActionBar"/>

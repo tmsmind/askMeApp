@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:theme="@style/MyToolbarStyle"
-        app:popupTheme="@style/Theme.AppCompat.Light" />
+        app:popupTheme="@style/MyToolbarPopUp" />
 
     <humesis.apps.humesisdirectionapp.utils.ui.MyViewPager
         android:layout_weight="1"

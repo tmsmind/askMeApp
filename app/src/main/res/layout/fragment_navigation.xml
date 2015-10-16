@@ -47,7 +47,7 @@
                         android:layout_height="wrap_content"
                         card_view:li_desc="Set starting point"
                         card_view:li_icon="@drawable/ic_location"
-                        card_view:li_title="" />
+                        card_view:li_title="From" />
 
                     <humesis.apps.humesisdirectionapp.utils.ui.ListItem
                         android:id="@+id/dest"
@@ -55,7 +55,7 @@
                         android:layout_height="wrap_content"
                         card_view:li_desc="Set destination"
                         card_view:li_icon="@drawable/ic_location"
-                        card_view:li_title="" />
+                        card_view:li_title="To" />
 
                 </LinearLayout>
 

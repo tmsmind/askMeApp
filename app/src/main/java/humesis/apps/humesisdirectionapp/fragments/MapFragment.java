@@ -1,6 +1,7 @@
 package humesis.apps.humesisdirectionapp.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
@@ -58,6 +60,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     ListView placesList;
     NearbyAdapter mAdapter;
     ArrayList<Place> nearbyPlaces = new ArrayList<>();
+    Marker currentLocationMarker;
+    ArrayList<Marker> markers = new ArrayList<>();
+    private Menu menu;
 
     public MapFragment() {
     }
@@ -153,7 +158,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mMap = googleMap;
         getLastKnownLocation();
         mMap.setOnMyLocationChangeListener(this);
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(false);
         mMap.setOnCameraChangeListener(this);
     }
 
@@ -161,6 +166,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.map_fragment_menu, menu);
+        this.menu = menu;
+        if(!(markers.size()>0))
+        menu.findItem(R.id.clear_map).setVisible(false);
     }
 
     @Override
@@ -172,7 +180,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Location location = humesis.apps.humesisdirectionapp.utils.LocationManager.getLastKnownLocation(getContext());
         switch (id) {
             case R.id.action_show_gas_station:
-                mMap.clear();
+                menu.findItem(R.id.clear_map).setVisible(true);
                 Log.e("Getting Place", "Gas Station");
                 if (location != null)
                     new GetPlacesAsync(getContext(), "gas_station", location).execute();
@@ -180,12 +188,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     Toast.makeText(getContext(), "Unable to get location", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_show_restaurents:
-                mMap.clear();
+                menu.findItem(R.id.clear_map).setVisible(true);
                 Log.e("Getting Place", "Restaurants");
                 if (location != null)
                     new GetPlacesAsync(getContext(), "cafe", location).execute();
                 else
                     Toast.makeText(getContext(), "Unable to get location", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.action_my_location:
+                zoomToLocation(getLastKnownLocation());
+                return true;
+
+            case R.id.clear_map:
+                menu.findItem(R.id.clear_map).setVisible(false);
+                for (Marker marker : markers) {
+                    marker.remove();
+                }
+                markers = new ArrayList<>();
+                bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
                 return true;
 
             default:
@@ -194,7 +215,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     private Location getLastKnownLocation() {
-        mLocationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
+        mLocationManager = (LocationManager) getActivity().getSystemService(Activity.LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
         Location bestLocation = null;
         for (String provider : providers) {
@@ -221,6 +242,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
         SettingsUtil.set(getContext(), AppPrefs.LAST_KNOWN_LOCATION, bestLocation);
         zoomToLocation(bestLocation);
+        onMyLocationChange(bestLocation);
         return bestLocation;
     }
 
@@ -240,7 +262,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onMyLocationChange(Location location) {
+        if(location!=null) {
+            if (currentLocationMarker != null) currentLocationMarker.remove();
 
+            currentLocationMarker = mMap.addMarker(new MarkerOptions()
+                    .title("My Location")
+                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_marker))
+                    .rotation(location.getBearing())
+                    .flat(true));
+        }
     }
 
     @Override
@@ -267,6 +298,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            for(Marker marker:markers){
+                marker.remove();
+            }
+            markers = new ArrayList<>();
+        }
+
+        @Override
         protected ArrayList<Place> doInBackground(Void... voids) {
             PlacesService service = new PlacesService(context.getResources().getString(R.string.places_web_key));
             ArrayList<Place> findPlaces = service.findPlaces(location.getLatitude(),
@@ -290,12 +330,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             nearbyPlaces = result;
             if (mMap != null)
                 for (Place place : result) {
-                    mMap.addMarker(new MarkerOptions()
-                            .title(place.getName())
-                            .position(
-                                    new LatLng(place.getLatitude(), place.getLongitude()))
-                            .icon(BitmapDescriptorFactory.fromBitmap(place.getBitmapIcon()))
-                            .snippet(place.getVicinity()));
+                    markers.add(
+                            mMap.addMarker(new MarkerOptions()
+                                    .title(place.getName())
+                                    .position(
+                                            new LatLng(place.getLatitude(), place.getLongitude()))
+                                    .icon(BitmapDescriptorFactory.fromBitmap(place.getBitmapIcon()))
+                                    .snippet(place.getVicinity()))
+                    );
                 }
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(result.get(0).getLatitude(), result

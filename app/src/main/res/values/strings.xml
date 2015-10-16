@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Humesis Direction App</string>
     <string name="title_activity_maps">Map</string>
-    <string name="action_settings">settings</string>
+    <string name="action_settings">Settings</string>
     <string name="facebook_app_id">298496490191692</string>
 
     <!-- getString(String, Object...) does not support HTML tags directly, they need to be encoded first.
