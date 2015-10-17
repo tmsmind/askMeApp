@@ -20,12 +20,14 @@ import android.widget.Toast;
 
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -224,10 +226,17 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         routeInfoCard.setVisibility(View.VISIBLE);
         routeInfo.setTitle("ETA " + gd.getTotalDurationText(doc));
         routeInfo.setSubTitle("Approx " + gd.getTotalDistanceText(doc));
-        mMap.addPolyline(gd.getPolyline(doc, 4, getResources().getColor(R.color.md_green_500)));
+        mMap.addPolyline(gd.getPolyline(doc, 6, getResources().getColor(R.color.md_red_500)));
         mMap.addMarker(new MarkerOptions().title(source.getName().toString()).position(source.getLatLng()));
         mMap.addMarker(new MarkerOptions().title(dest.getName().toString()).position(dest.getLatLng()));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12));
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for(LatLng latLng: gd.getSection(doc)){
+            builder.include(latLng);
+        }
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
+        mMap.moveCamera(cu);
+        mMap.animateCamera(cu);
         bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         if(directionsAdapter==null){
             directionsAdapter = new DirectionsAdapter(getContext(),gd.getInstructions(doc));

@@ -322,7 +322,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     }
                 }
             });
-        }
+        }else
         Log.e("TAG", "Google API client is not connected for autocomplete query.");
     }
 }

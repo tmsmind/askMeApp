@@ -236,8 +236,9 @@ public class PlaceAutocompleteAdapter
 
             // Freeze the results immutable representation that can be stored safely.
             return DataBufferUtils.freezeAndClose(autocompletePredictions);
-        }
+        }else
         Log.e(TAG, "Google API client is not connected for autocomplete query.");
+
         return null;
     }
 
