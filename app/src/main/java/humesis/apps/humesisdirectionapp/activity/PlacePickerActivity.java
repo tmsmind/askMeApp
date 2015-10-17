@@ -282,7 +282,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         Log.e("Returning:", place.getName().toString());
         Intent result = getIntent();
         setResult(RESULT_OK,result);
-        EventBus.getDefault().postSticky(new Event().new PlaceEvent(notifyType, place));
+        EventBus.getDefault().postSticky(new Event.PlaceEvent(notifyType, place));
         finish();
     }
 

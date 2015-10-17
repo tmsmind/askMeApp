@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:CircleProgressView="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <com.rey.material.widget.Spinner
+        android:id="@+id/car_make"
+        style="@style/Material.Widget.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:popupBackground="@color/white"
+        app:rd_style="@style/Material.Drawable.Ripple.Wave"
+        app:spn_label="Select Model"
+        app:spn_labelEnable="true"
+        app:spn_labelTextColor="@color/accent"
+        app:spn_labelTextSize="15sp" />
+
+    <com.rey.material.widget.Spinner
+        android:id="@+id/car_model"
+        style="@style/Material.Widget.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:popupBackground="@color/white"
+        android:visibility="gone"
+        app:rd_style="@style/Material.Drawable.Ripple.Wave"
+        app:spn_label="Select Make"
+        app:spn_labelEnable="true"
+        app:spn_labelTextColor="@color/accent"
+        app:spn_labelTextSize="15sp" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Fuel Status"
+        android:textColor="@color/accent"
+        android:textSize="@dimen/place_picker_suggest_list_row_description" />
+
+    <at.grabner.circleprogress.CircleProgressView
+        android:id="@+id/circleView"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        CircleProgressView:cpv_autoTextSize="true"
+        CircleProgressView:cpv_barColor="#00796B"
+        CircleProgressView:cpv_barWidth="7dp"
+        CircleProgressView:cpv_contourSize="0dp"
+        CircleProgressView:cpv_maxValue="100"
+        CircleProgressView:cpv_rimColor="#B2DFDB"
+        CircleProgressView:cpv_rimWidth="7dp"
+        CircleProgressView:cpv_seekMode="true"
+        CircleProgressView:cpv_showUnit="true"
+        CircleProgressView:cpv_textColor="#00796B"
+        CircleProgressView:cpv_textMode="Percent"
+        CircleProgressView:cpv_textSize="15sp"
+        CircleProgressView:cpv_unit="%"
+        CircleProgressView:cpv_unitColor="#009688" />
+
+    <com.rey.material.widget.EditText
+        android:id="@+id/textfield_et_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Input with label"
+        android:inputType="text"
+        app:et_inputId="@+id/textfield_et_label_input"
+        app:et_labelEnable="true"
+        app:et_labelTextColor="@color/accent"
+        app:et_labelTextSize="16sp"
+        app:et_supportMode="none" />
+
+</LinearLayout>

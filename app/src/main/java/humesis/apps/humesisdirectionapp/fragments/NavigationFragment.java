@@ -18,17 +18,19 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.rey.material.widget.Spinner;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.w3c.dom.Document;
@@ -61,6 +63,8 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
     LinearLayout dragView;
     ListView directionLists;
     DirectionsAdapter directionsAdapter;
+    private SupportMapFragment mapFragment;
+
     public NavigationFragment() {
     }
 
@@ -140,7 +144,7 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
 
         bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentByTag("DirectionsMap");
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentByTag("DirectionsMap");
         if (mapFragment!=null)
         mapFragment.getMapAsync(this);
 
@@ -191,6 +195,16 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         }
     }
 
+    public void setCarInfo(View view){
+        Spinner spinner = (Spinner) view.findViewById(R.id.car_make);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.filter_nearby_values, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+    }
+
     public void openPlacePicker(Event.EventType code,int result) {
 
         Intent intent = new Intent(getContext(), PlacePickerActivity.class);
@@ -226,15 +240,15 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         routeInfoCard.setVisibility(View.VISIBLE);
         routeInfo.setTitle("ETA " + gd.getTotalDurationText(doc));
         routeInfo.setSubTitle("Approx " + gd.getTotalDistanceText(doc));
-        mMap.addPolyline(gd.getPolyline(doc, 6, getResources().getColor(R.color.md_red_500)));
-        mMap.addMarker(new MarkerOptions().title(source.getName().toString()).position(source.getLatLng()));
-        mMap.addMarker(new MarkerOptions().title(dest.getName().toString()).position(dest.getLatLng()));
+        mMap.addPolyline(gd.getPolyline(doc, 6, getResources().getColor(R.color.colorPrimaryDark)));
+        mMap.addMarker(new MarkerOptions().title(source.getName().toString()).position(source.getLatLng()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_flag_from)));
+        mMap.addMarker(new MarkerOptions().title(dest.getName().toString()).position(dest.getLatLng()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_flag_to)));
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for(LatLng latLng: gd.getSection(doc)){
             builder.include(latLng);
         }
         LatLngBounds bounds = builder.build();
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds ,50);
         mMap.moveCamera(cu);
         mMap.animateCamera(cu);
         bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);

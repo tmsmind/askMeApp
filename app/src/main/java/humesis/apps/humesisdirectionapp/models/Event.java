@@ -15,7 +15,8 @@ public class Event {
         PLACE_PICKED,
         NO_PLACE_PICKED,
         SOURCE_PICKED,
-        DEST_PICKED
+        DEST_PICKED,
+        NEW_CAR
     }
 
     EventType eventType;
@@ -31,7 +32,7 @@ public class Event {
         return eventType;
     }
 
-    public class PlaceEvent{
+    public static class PlaceEvent{
         Place place;
         EventType eventType;
 
@@ -46,6 +47,28 @@ public class Event {
 
         public Place getPlace() {
             return place;
+        }
+
+        public EventType getEventType() {
+            return eventType;
+        }
+    }
+
+    public static class NewCarEvent{
+        SavedCars cars;
+        EventType eventType;
+
+        public NewCarEvent(EventType eventType) {
+            this.eventType = eventType;
+        }
+
+        public NewCarEvent(SavedCars cars, EventType eventType) {
+            this.cars = cars;
+            this.eventType = eventType;
+        }
+
+        public SavedCars getCars() {
+            return cars;
         }
 
         public EventType getEventType() {

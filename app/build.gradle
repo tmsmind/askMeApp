@@ -12,6 +12,10 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+    maven { url "https://jitpack.io" }
 }
 
 android {
@@ -48,6 +52,8 @@ dependencies {
     compile 'com.squareup.okio:okio:1.6.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.github.rey5137:material:1.2.1.6-SNAPSHOT'
+    compile 'com.github.jakob-grabner:Circle-Progress-View:v1.2.4'
     compile('com.mikepenz:materialdrawer:4.3.4@aar') { //side drawer for android
         transitive = true
     }
@@ -55,7 +61,6 @@ dependencies {
     compile('com.twitter.sdk.android:twitter:1.8.0@aar') {
         transitive = true;
     }
-    compile 'com.flipboard:bottomsheet-core:1.4.3'
     compile('com.afollestad.material-dialogs:core:0.8.2.0@aar') {
         transitive = true
     }
