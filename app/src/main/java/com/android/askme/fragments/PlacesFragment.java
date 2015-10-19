@@ -21,6 +21,7 @@ import com.android.askme.R;
 import com.android.askme.adapters.NearbyAdapter;
 import com.android.askme.placepicker.Place;
 import com.android.askme.placepicker.PlacesService;
+import com.android.askme.preferences.SettingsUtil;
 import com.android.askme.utils.LocationManager;
 
 import java.util.ArrayList;
@@ -91,17 +92,25 @@ public class PlacesFragment extends Fragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_filter:
+                Integer[] values = SettingsUtil.get(getContext(),"place_filter", (Integer[]) null);
+
                 new MaterialDialog.Builder(getContext())
-                        .title("Filter Listing")
-                        .items(R.array.filter_nearby_values)
-                        .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                        .title("Place Type")
+                        .items(R.array.filter_nearby_name)
+                        .itemsCallbackMultiChoice(values, new MaterialDialog.ListCallbackMultiChoice() {
                             @Override
                             public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
-                                /**
-                                 * If you use alwaysCallMultiChoiceCallback(), which is discussed below,
-                                 * returning false here won't allow the newly selected check box to actually be selected.
-                                 * See the limited multi choice dialog example in the sample project for details.
-                                 **/
+
+                                StringBuilder places = new StringBuilder();
+                                String[] values = getResources().getStringArray(R
+                                        .array.filter_nearby_values);
+                                for (int id : which) {
+                                    places.append(values[id]).append("|");
+                                }
+                                new GetPlacesAsync(getContext(), places.toString(),
+                                        mCurrentLocation)
+                                        .execute();
+                                SettingsUtil.set(getContext(), "place_filter", which);
                                 return true;
                             }
                         })

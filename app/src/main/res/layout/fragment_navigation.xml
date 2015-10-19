@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:sothree="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:map="http://schemas.android.com/tools">
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         android:id="@+id/sliding_layout"
@@ -32,17 +33,17 @@
                         android:id="@+id/source"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        card_view:li_desc="Set starting point"
-                        card_view:li_icon="@drawable/ic_flag_from"
-                        card_view:li_title="From" />
+                        app:li_desc="Set starting point"
+                        app:li_icon="@drawable/ic_flag_from"
+                        app:li_title="From" />
 
                     <com.android.askme.utils.ui.ListItem
                         android:id="@+id/dest"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        card_view:li_desc="Set destination"
-                        card_view:li_icon="@drawable/ic_flag_to"
-                        card_view:li_title="To" />
+                        app:li_desc="Set destination"
+                        app:li_icon="@drawable/ic_flag_to"
+                        app:li_title="To" />
 
                 </LinearLayout>
 
@@ -51,7 +52,10 @@
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:tag="DirectionsMap" />
+                android:tag="DirectionsMap"
+                map:cameraZoom="13"
+                map:mapType="normal"
+                map:liteMode="true" />
 
         </LinearLayout>
 
@@ -69,19 +73,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="68dp">
 
-                <com.android.askme.utils.ui.ListItem
-                    android:id="@+id/route_info"
+                <LinearLayout
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    card_view:li_desc="-km"
-                    card_view:li_icon="@drawable/ic_start_nav"
-                    card_view:li_title="ETA -" />
+                    android:layout_height="match_parent">
 
-                <Button
-                    style="?attr/buttonBarButtonStyle"
-                    android:text="Start"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    <com.android.askme.utils.ui.ListItem
+                        android:layout_weight="1"
+                        android:id="@+id/route_info"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:li_desc="-km"
+                        app:li_icon="@drawable/ic_eta"
+                        app:li_title="ETA -" />
+
+                    <Button
+                        android:background="@drawable/md_btn_selector"
+                        android:id="@+id/start_navigation"
+                        style="?attr/buttonBarButtonStyle"
+                        android:drawableLeft="@drawable/ic_start_nav"
+                        android:drawablePadding="10dp"
+                        android:text="Start"
+                        android:textColor="@color/Black"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
 
             </android.support.v7.widget.CardView>
 

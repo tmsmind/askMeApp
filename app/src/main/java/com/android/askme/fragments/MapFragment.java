@@ -247,7 +247,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     void zoomToLocation(Location location) {
         if (location != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(location.getLatitude(), location.getLongitude()), 13));
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user

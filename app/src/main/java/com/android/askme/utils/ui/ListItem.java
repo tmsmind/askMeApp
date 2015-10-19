@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.support.annotation.DrawableRes;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -25,6 +26,13 @@ public class ListItem extends LinearLayout {
 
     public ListItem(Context context) {
         super(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater.inflate(R.layout.listview_row, this, true);
+        View view = inflater.inflate(R.layout.listview_row, this, true);
+
+        iconIV = (ImageView) view.findViewById(R.id.icon);
+        titleTV = (TextView) view.findViewById(R.id.name);
+        subTitleTV = (TextView) view.findViewById(R.id.description);
     }
 
     public ListItem(Context context, AttributeSet attrs) {
@@ -33,12 +41,16 @@ public class ListItem extends LinearLayout {
                 R.styleable.ListItem, 0, 0);
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.listview_row, this, true);
+        View view = inflater.inflate(R.layout.listview_row, this, true);
 
         icon = a.getResourceId(R.styleable.ListItem_li_icon, R.drawable.ic_person);
         title = a.getString(R.styleable.ListItem_li_title);
         subTitle = a.getString(R.styleable.ListItem_li_desc);
-        showIcon = a.getBoolean(R.styleable.ListItem_li_show_icon,true);
+        showIcon = a.getBoolean(R.styleable.ListItem_li_show_icon, true);
+
+        iconIV = (ImageView) view.findViewById(R.id.icon);
+        titleTV = (TextView) view.findViewById(R.id.name);
+        subTitleTV = (TextView) view.findViewById(R.id.description);
 
         a.recycle();
     }
@@ -46,10 +58,6 @@ public class ListItem extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-
-        iconIV = (ImageView) findViewById(R.id.icon);
-        titleTV = (TextView) findViewById(R.id.name);
-        subTitleTV = (TextView) findViewById(R.id.description);
 
         iconIV.setImageResource(icon);
         titleTV.setText(title);
@@ -72,13 +80,18 @@ public class ListItem extends LinearLayout {
         invalidate();
     }
 
-    public void setShowIcon(boolean showIcon){
-        iconIV.setVisibility(showIcon?VISIBLE:GONE);
+    public void showIcon(boolean showIcon){
+        iconIV.setVisibility(showIcon ? VISIBLE : GONE);
         invalidate();
     }
 
     public ImageView getIconIV(){
         return iconIV;
+    }
+
+    public void setSingleLine(boolean singleLine){
+        titleTV.setSingleLine(singleLine);
+        invalidate();
     }
 
 }

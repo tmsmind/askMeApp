@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class SettingsUtil {
     public static boolean contains(Context context, int resId) {
@@ -73,6 +74,14 @@ public class SettingsUtil {
         commitOrApply(editor);
     }
 
+    public static void set(Context context, String key, Integer[] values) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Editor editor = prefs.edit();
+        String value = Arrays.toString(values);
+        editor.putString(key, value);
+        commitOrApply(editor);
+    }
+
     public static void set(Context context, int resId, long value) {
         set(context, context.getString(resId), value);
     }
@@ -95,7 +104,7 @@ public class SettingsUtil {
         commitOrApply(editor);
     }
 
-    public static <T> void set(Context context, String key, T value){
+    public static <T> void set(Context context, String key, T value) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Editor editor = prefs.edit();
         editor.putString(key, new Gson().toJson(value));
@@ -128,6 +137,24 @@ public class SettingsUtil {
         return prefs.getInt(key, defValue);
     }
 
+    public static Integer[] get(Context context, String key, Integer[] defValue) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String values = prefs.getString(key, "");
+        Log.e("Values", values);
+        String[] items = values.replaceAll("\\[","").replaceAll("\\]", "").replaceAll(" ", "").split(",");
+        Log.e("Items", Arrays.toString(items));
+        Integer[] results = new Integer[items.length];
+        try {
+            for (int i = 0; i < items.length; i++) {
+                results[i] = Integer.parseInt(items[i]);
+            }
+            return results;
+        } catch (NumberFormatException nfe) {
+            nfe.printStackTrace();
+            return defValue;
+        }
+    }
+
     public static long get(Context context, int resId, long defValue) {
         return get(context, context.getString(resId), defValue);
     }
@@ -146,10 +173,10 @@ public class SettingsUtil {
         return prefs.getString(key, defValue);
     }
 
-    public static <T> T get(Context context, String key,Class<T> classOfT ,T defValue) {
+    public static <T> T get(Context context, String key, Class<T> classOfT, T defValue) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String value = prefs.getString(key, new Gson().toJson(defValue));
-        return new Gson().fromJson(value,classOfT);
+        return new Gson().fromJson(value, classOfT);
     }
 
     public static Editor getEditor(Context context) {

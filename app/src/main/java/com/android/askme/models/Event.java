@@ -4,7 +4,10 @@
 
 package com.android.askme.models;
 
+import com.android.askme.utils.GoogleDirection;
 import com.google.android.gms.location.places.Place;
+
+import org.w3c.dom.Document;
 
 /**
  * Created by dhanraj on 25/09/15.
@@ -73,6 +76,39 @@ public class Event {
 
         public EventType getEventType() {
             return eventType;
+        }
+    }
+
+    public static class DirectionEvent{
+        GoogleDirection googleDirection;
+        Document document;
+        Place source;
+        Place dest;
+
+        public DirectionEvent() {
+        }
+
+        public DirectionEvent(GoogleDirection googleDirection, Document document, Place source, Place dest) {
+            this.googleDirection = googleDirection;
+            this.document = document;
+            this.source = source;
+            this.dest = dest;
+        }
+
+        public GoogleDirection getGoogleDirection() {
+            return googleDirection;
+        }
+
+        public Document getDocument() {
+            return document;
+        }
+
+        public Place getSource() {
+            return source;
+        }
+
+        public Place getDest() {
+            return dest;
         }
     }
 }

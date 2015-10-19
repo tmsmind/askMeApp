@@ -12,16 +12,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.askme.R;
+import com.android.askme.activity.DirectionActivity;
 import com.android.askme.activity.PlacePickerActivity;
 import com.android.askme.adapters.DirectionsAdapter;
 import com.android.askme.models.Event;
 import com.android.askme.preferences.AppPrefs;
 import com.android.askme.utils.GoogleDirection;
+import com.android.askme.utils.Utils;
 import com.android.askme.utils.ui.ListItem;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdate;
@@ -47,16 +50,18 @@ import de.greenrobot.event.EventBus;
  */
 public class NavigationFragment extends Fragment implements View.OnClickListener, GoogleDirection.OnDirectionResponseListener, OnMapReadyCallback, GoogleMap.OnMyLocationChangeListener, GoogleMap.OnCameraChangeListener {
     private static View rootView;
-    ListItem sourceItem,destItem,routeInfo;
-    boolean srcPicked,destPicked = false;
-    Place source,dest;
-    private GoogleDirection googleDirection;
+    ListItem sourceItem, destItem, routeInfo;
+    boolean srcPicked, destPicked = false;
+    Place source, dest;
     CardView routeInfoCard;
-    private GoogleMap mMap;
     SlidingUpPanelLayout bottomSheet;
     LinearLayout dragView;
     ListView directionLists;
     DirectionsAdapter directionsAdapter;
+    Button startNavigation;
+    Event.DirectionEvent directionEvent;
+    private GoogleDirection googleDirection;
+    private GoogleMap mMap;
     private SupportMapFragment mapFragment;
 
     public NavigationFragment() {
@@ -85,7 +90,7 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         super.onStop();
     }
 
-    public void onEvent(Event.PlaceEvent event){
+    public void onEvent(Event.PlaceEvent event) {
         try {
             Log.e("Event Recieved", event.getPlace().getName().toString());
             switch (event.getEventType()) {
@@ -104,11 +109,12 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
                     getRouteInfo();
                     break;
             }
-        }catch (Exception e){
-            Toast.makeText(getContext(),"Error getting location data, try again later",Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Error getting location data, try again later", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -135,15 +141,17 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         bottomSheet = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_layout);
         dragView = (LinearLayout) view.findViewById(R.id.dragView);
         directionLists = (ListView) view.findViewById(R.id.list);
+        startNavigation = (Button) view.findViewById(R.id.start_navigation);
 
         bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentByTag("DirectionsMap");
-        if (mapFragment!=null)
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null)
+            mapFragment.getMapAsync(this);
 
         sourceItem.setOnClickListener(this);
         destItem.setOnClickListener(this);
+        startNavigation.setOnClickListener(this);
 
         bottomSheet.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -179,17 +187,23 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.source:
-                openPlacePicker(Event.EventType.SOURCE_PICKED,AppPrefs.SOURCE_PICKED);
+                openPlacePicker(Event.EventType.SOURCE_PICKED, AppPrefs.SOURCE_PICKED);
                 srcPicked = true;
                 break;
 
             case R.id.dest:
-                 openPlacePicker(Event.EventType.DEST_PICKED,AppPrefs.DEST_PICKED);
+                openPlacePicker(Event.EventType.DEST_PICKED, AppPrefs.DEST_PICKED);
+                break;
+
+            case R.id.start_navigation:
+                startActivity(new Intent(getActivity(), DirectionActivity.class));
+                if (directionEvent != null)
+                    EventBus.getDefault().postSticky(directionEvent);
                 break;
         }
     }
 
-    public void setCarInfo(View view){
+    public void setCarInfo(View view) {
         Spinner spinner = (Spinner) view.findViewById(R.id.car_make);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -199,23 +213,23 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
 
     }
 
-    public void openPlacePicker(Event.EventType code,int result) {
+    public void openPlacePicker(Event.EventType code, int result) {
 
         Intent intent = new Intent(getContext(), PlacePickerActivity.class);
         EventBus.getDefault().postSticky(new Event(code));
         startActivityForResult(intent, result);
     }
 
-    void getRouteInfo(){
+    void getRouteInfo() {
         mMap.clear();
-        if(srcPicked && destPicked){
+        if (srcPicked && destPicked) {
             googleDirection.request(source.getLatLng(), dest.getLatLng(), GoogleDirection.MODE_DRIVING);
         }
     }
 
     void zoomToLocation(Location location) {
         if (location != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(location.getLatitude(), location.getLongitude()), 13));
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
@@ -235,23 +249,29 @@ public class NavigationFragment extends Fragment implements View.OnClickListener
         routeInfo.setTitle("ETA " + gd.getTotalDurationText(doc));
         routeInfo.setSubTitle("Approx " + gd.getTotalDistanceText(doc));
         mMap.addPolyline(gd.getPolyline(doc, 6, getResources().getColor(R.color.colorPrimaryDark)));
-        mMap.addMarker(new MarkerOptions().title(source.getName().toString()).position(source.getLatLng()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_flag_from)));
-        mMap.addMarker(new MarkerOptions().title(dest.getName().toString()).position(dest.getLatLng()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_flag_to)));
+        mMap.addMarker(new MarkerOptions().title(source.getName().toString()).position(source
+                .getLatLng()).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_flag_from)));
+        mMap.addMarker(new MarkerOptions().title(dest.getName().toString()).position(dest.getLatLng()).icon(BitmapDescriptorFactory.fromResource(R
+                .drawable.ic_flag_to)));
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for(LatLng latLng: gd.getSection(doc)){
+        for (LatLng latLng : gd.getSection(doc)) {
             builder.include(latLng);
         }
         LatLngBounds bounds = builder.build();
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds ,50);
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, Utils.getPadding(getContext(),50));
         mMap.moveCamera(cu);
         mMap.animateCamera(cu);
+        mMap.setPadding(0, 0, 0, Utils.getPadding(getContext(),68));
+
         bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        if(directionsAdapter==null){
-            directionsAdapter = new DirectionsAdapter(getContext(),gd.getInstructions(doc));
+        if (directionsAdapter == null) {
+            directionsAdapter = new DirectionsAdapter(getContext(), gd.getInstructions(doc));
             directionLists.setAdapter(directionsAdapter);
-        }else{
+        } else {
             directionsAdapter.updateList(gd.getInstructions(doc));
         }
+
+        directionEvent = new Event.DirectionEvent(gd, doc, source, dest);
     }
 
     @Override

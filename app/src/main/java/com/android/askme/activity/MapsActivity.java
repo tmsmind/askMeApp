@@ -64,7 +64,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         mMap.setMyLocationEnabled(true);
         mMap.setOnCameraChangeListener(this);
         googleDirection = new GoogleDirection(getActivity());
-
+        getLastKnownLocation();
     }
 
     private void getLastKnownLocation() {
@@ -104,7 +104,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
                     .zoom(17)                   // Sets the zoom
                     .bearing(90)                // Sets the orientation of the camera to east
-                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                    .tilt(90)                   // Sets the tilt of the camera to 30 degrees
                     .build();                   // Creates a CameraPosition from the builder
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
