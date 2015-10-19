@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="humesis.apps.humesisdirectionapp" >
+    package="com.android.askme" >
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -12,10 +12,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="humesis.apps.humesisdirectionapp.permission.MAPS_RECEIVE" />
 
     <permission
-        android:name="humesis.apps.humesisdirectionapp.permission.MAPS_RECEIVE"
+        android:name="com.android.askme.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
     <!--
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -26,7 +25,7 @@
 
 
     <application
-        android:name=".MyApplication"
+        android:name="com.android.askme.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -50,11 +49,11 @@
             android:value="@string/facebook_app_id" />
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name="com.android.askme.activity.MainActivity"
             android:label="@string/title_activity_maps" >
         </activity>
 
-        <activity android:name=".activity.LoginActivity" android:theme="@style/FullScreen">
+        <activity android:name="com.android.askme.activity.LoginActivity" android:theme="@style/FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,8 +61,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.PlacePickerActivity" android:theme="@style/AppTheme"/>
-        <activity android:name=".activity.NewCarActivity"/>
+        <activity android:name="com.android.askme.activity.PlacePickerActivity" android:theme="@style/AppTheme"/>
+        <activity android:name="com.android.askme.activity.NewCarActivity"/>
 
         <activity
             android:name="com.facebook.FacebookActivity"

@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="68dp">
 
-                <humesis.apps.humesisdirectionapp.utils.ui.ListItem
+                <com.android.askme.utils.ui.ListItem
                     android:id="@+id/place_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

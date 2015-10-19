@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <humesis.apps.humesisdirectionapp.utils.ui.TabButtons
+        <com.android.askme.utils.ui.TabButtons
             app:tab_indicator_enabled="true"
             app:tab_button_drawable="@drawable/ic_map"
             android:id="@+id/maps_button"
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <humesis.apps.humesisdirectionapp.utils.ui.TabButtons
+        <com.android.askme.utils.ui.TabButtons
             app:tab_indicator_enabled="false"
             app:tab_button_drawable="@drawable/ic_car"
             android:id="@+id/cars_button"
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <humesis.apps.humesisdirectionapp.utils.ui.TabButtons
+        <com.android.askme.utils.ui.TabButtons
             app:tab_indicator_enabled="false"
             app:tab_button_drawable="@drawable/ic_navigation"
             android:id="@+id/direction_button"
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <humesis.apps.humesisdirectionapp.utils.ui.TabButtons
+        <com.android.askme.utils.ui.TabButtons
             app:tab_indicator_enabled="false"
             app:tab_button_drawable="@drawable/ic_view_list"
             android:id="@+id/places_list_button"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <humesis.apps.humesisdirectionapp.utils.ui.TabButtons
+        <com.android.askme.utils.ui.TabButtons
             app:tab_indicator_enabled="false"
             app:tab_button_drawable="@drawable/ic_person"
             android:id="@+id/profile_button"

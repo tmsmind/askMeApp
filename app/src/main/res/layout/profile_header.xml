@@ -26,7 +26,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <humesis.apps.humesisdirectionapp.utils.ui.CircleImageView
+                <com.android.askme.utils.ui.CircleImageView
                     card_view:border_width="2dp"
                     card_view:border_color="@color/md_white_1000"
                     android:layout_gravity="center|bottom"
@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-                <humesis.apps.humesisdirectionapp.utils.ui.ListItem
+                <com.android.askme.utils.ui.ListItem
                     android:id="@+id/userName"
                     card_view:li_title="User Name"
                     card_view:li_desc="user@mail.com"

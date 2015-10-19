@@ -60,7 +60,7 @@
 
     </RelativeLayout>
 
-    <humesis.apps.humesisdirectionapp.utils.ui.MaterialProgressBar
+    <com.android.askme.utils.ui.MaterialProgressBar
         android:visibility="gone"
         android:id="@+id/progress_bar"
         android:layout_width="48dp"

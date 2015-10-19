@@ -64,7 +64,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <humesis.apps.humesisdirectionapp.utils.ui.ListItem
+            <com.android.askme.utils.ui.ListItem
                 android:id="@+id/car_make"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
                 app:li_icon="@drawable/ic_car_make"
                 app:li_title="Car Make" />
 
-            <humesis.apps.humesisdirectionapp.utils.ui.ListItem
+            <com.android.askme.utils.ui.ListItem
                 android:id="@+id/car_model"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -1,6 +1,9 @@
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        maven {
+            url 'http://dl.bintray.com/amulyakhare/maven'
+        }
     }
 
     dependencies {
@@ -23,7 +26,7 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "humesis.apps.humesisdirectionapp"
+        applicationId "com.android.askme"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
@@ -65,4 +68,5 @@ dependencies {
         transitive = true
     }
     compile 'com.sothree.slidinguppanel:library:3.2.0'
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 }

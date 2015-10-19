@@ -12,7 +12,7 @@
         android:theme="@style/MyToolbarStyle"
         app:popupTheme="@style/MyToolbarPopUp" />
 
-    <humesis.apps.humesisdirectionapp.utils.ui.MyViewPager
+    <com.android.askme.utils.ui.MyViewPager
         android:layout_weight="1"
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
