@@ -31,6 +31,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.askme.R;
 import com.android.askme.models.LocalProfile;
@@ -81,7 +82,14 @@ public class ProfileFragment extends Fragment {
 
         profileHeader.setName(profile.name);
         profileHeader.setEmail(profile.email);
-        Picasso.with(getContext()).load(profile.profilePic).placeholder(R.drawable.com_facebook_profile_picture_blank_square).into(profileHeader.getProfilePhotoView());
-        Picasso.with(getContext()).load(profile.coverPic).placeholder(R.drawable.header).into(profileHeader.getCoverView());
+        try {
+            Picasso.with(getContext()).load(profile.profilePic).placeholder(R.drawable.com_facebook_profile_picture_blank_square).into(profileHeader.getProfilePhotoView());
+            Picasso.with(getContext()).load(profile.coverPic).placeholder(R.drawable.header).into(profileHeader.getCoverView());
+        }catch (Exception e){
+            e.printStackTrace();
+            Picasso.with(getContext()).load(R.drawable.com_facebook_profile_picture_blank_square).placeholder(R.drawable.com_facebook_profile_picture_blank_square).into(profileHeader.getProfilePhotoView());
+            Picasso.with(getContext()).load(R.drawable.header).placeholder(R.drawable.header).into(profileHeader.getCoverView());
+            Toast.makeText(getContext(),"Unable to get Profile Photo",Toast.LENGTH_SHORT).show();
+        }
     }
 }
