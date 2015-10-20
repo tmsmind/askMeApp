@@ -126,18 +126,23 @@ public class DirectionActivity extends AppCompatActivity implements OnMapReadyCa
 
         viewPager = (WrapContentViewPager) findViewById(R.id.view_pager);
 
+        buttonPrevious.setEnabled(false);
 
         buttonPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (viewPager.getCurrentItem() != 0) {
+                    viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
+                }
             }
         });
 
         buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (viewPager.getCurrentItem() != viewPager.getAdapter().getCount() - 1) {
+                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+                }
             }
         });
     }
@@ -168,6 +173,14 @@ public class DirectionActivity extends AppCompatActivity implements OnMapReadyCa
             @Override
             public void onPageSelected(int position) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sections.get(position), 18.5f));
+                if(position==0){
+                    buttonPrevious.setEnabled(false);
+                }else if(position == viewPager.getAdapter().getCount()-1){
+                    buttonNext.setEnabled(false);
+                }else{
+                    buttonPrevious.setEnabled(true);
+                    buttonNext.setEnabled(true);
+                }
             }
 
             @Override
@@ -285,6 +298,7 @@ public class DirectionActivity extends AppCompatActivity implements OnMapReadyCa
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
+
     }
 
 }

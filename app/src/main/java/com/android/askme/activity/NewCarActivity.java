@@ -37,12 +37,13 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.askme.R;
-import com.android.askme.models.Cars;
 import com.android.askme.models.Event;
 import com.android.askme.models.SavedCars;
+import com.android.askme.models.Toyota;
 import com.android.askme.utils.ui.ListItem;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -63,9 +64,9 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
     SeekBar carFuel;
     FloatingActionButton saveCar;
 
-    Cars selectedCar;
+    Toyota selectedCar;
     SavedCars newCar = new SavedCars();
-    private ArrayList<Cars> carsList;
+    private ArrayList<Toyota> carsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,13 +114,13 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
     void readCarsData() {
         InputStream is = null;
         try {
-            is = getAssets().open("cars.txt");
+            is = getAssets().open("toyota.txt");
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
             String bufferString = new String(buffer);
-            Type listType = new TypeToken<ArrayList<Cars>>() {
+            Type listType = new TypeToken<ArrayList<Toyota>>() {
             }.getType();
             carsList = new Gson().fromJson(bufferString, listType);
         } catch (IOException e) {
@@ -129,8 +130,8 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
 
     void prepareCarMake() {
         final List<CharSequence> carMakes = new ArrayList<>();
-        for (Cars cars : carsList) {
-            carMakes.add(cars.getTitle());
+        for (int i =0;i<75;i++) {
+            carMakes.add(carsList.get(i).Model);
         }
         new MaterialDialog.Builder(this)
                 .title("Manufacturer")
@@ -139,20 +140,16 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         selectedCar = carsList.get(which);
-                        carMake.setSubTitle(selectedCar.getTitle());
-                        newCar.setCarMake(selectedCar.getTitle());
-                        carModel.setVisibility(View.VISIBLE);
                         return true;
                     }
                 })
                 .show();
-
     }
 
     void prepareCarModel() {
         final List<CharSequence> carModels = new ArrayList<>();
-        for (Cars.ModelsEntity modelsEntity : selectedCar.getModels()) {
-            carModels.add(modelsEntity.getTitle());
+        for (int i = 0; i < 13; i++) {
+            carModels.add(carsList.get(i).Model);
         }
         new MaterialDialog.Builder(this)
                 .title("Model")
@@ -160,7 +157,9 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
                 .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+
                         carModel.setSubTitle(String.valueOf(carModels.get(which)));
+                        newCar.setCarMake("Toyota");
                         newCar.setCarModel(String.valueOf(carModels.get(which)));
 
                         if(carName.getText().length()<1) carName.setText(newCar.getCarMake()+" "+newCar.getCarModel());
@@ -175,7 +174,7 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.car_make:
-                prepareCarMake();
+                //prepareCarMake();
                 break;
 
             case R.id.car_model:
@@ -183,7 +182,7 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.new_car_button:
-                if(newCar.getCarMake()!=null) {
+                if(newCar.getCarModel()!=null) {
                     SavedCars.addCarToList(newCar, getApplicationContext());
                     EventBus.getDefault().postSticky(new Event.NewCarEvent(Event.EventType.NEW_CAR));
                     finish();

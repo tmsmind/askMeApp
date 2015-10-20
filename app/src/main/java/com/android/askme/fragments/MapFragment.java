@@ -182,7 +182,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mMap.setOnMyLocationChangeListener(this);
         mMap.setMyLocationEnabled(true);
         mMap.setOnCameraChangeListener(this);
-        zoomToLocation(mMap.getMyLocation());
+        zoomToLocation(getLastKnownLocation());
     }
 
     @Override
@@ -264,7 +264,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         }
         SettingsUtil.set(getContext(), AppPrefs.LAST_KNOWN_LOCATION, bestLocation);
-        zoomToLocation(bestLocation);
         onMyLocationChange(bestLocation);
         return bestLocation;
     }

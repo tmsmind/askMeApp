@@ -46,27 +46,30 @@
         android:layout_height="wrap_content" />
 
     <LinearLayout
+        android:background="@color/Transparent_White"
         android:layout_margin="16dp"
         android:layout_gravity="right|bottom"
         android:gravity="center"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="36dp">
 
         <ImageButton
             android:id="@+id/button_previous"
-            android:background="@drawable/button_press_states"
-            android:src="@drawable/ic_chevron_left_black_36dp"
+            android:background="@drawable/left_chevron_press_states"
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
 
+        <View
+            android:background="@color/gray_semi_transparent_pressed"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"/>
+
         <ImageButton
             android:id="@+id/button_next"
-            android:background="@drawable/button_press_states"
-            android:src="@drawable/ic_chevron_right_black_36dp"
+            android:background="@drawable/right_chevron_press_states"
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
 
     </LinearLayout>
-
 </FrameLayout>
