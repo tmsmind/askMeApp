@@ -326,39 +326,43 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         @Override
         protected void onPostExecute(ArrayList<Place> result) {
             super.onPostExecute(result);
-            nearbyPlaces = result;
-            if (mMap != null)
-                for (Place place : result) {
-                    markers.add(
-                            mMap.addMarker(new MarkerOptions()
-                                    .title(place.getName())
-                                    .position(
-                                            new LatLng(place.getLatitude(), place.getLongitude()))
-                                    .icon(BitmapDescriptorFactory.fromBitmap(place.getBitmapIcon()))
-                                    .snippet(place.getVicinity()))
-                    );
-                }
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(result.get(0).getLatitude(), result
-                            .get(0).getLongitude())) // Sets the center of the map to
-                            // Mountain View
-                    .zoom(15) // Sets the zoom
-                    .tilt(30) // Sets the tilt of the camera to 30 degrees
-                    .build(); // Creates a CameraPosition from the builder
-            mMap.animateCamera(CameraUpdateFactory
-                    .newCameraPosition(cameraPosition));
+            if (result.size() > 0) {
+                nearbyPlaces = result;
+                if (mMap != null)
+                    for (Place place : result) {
+                        markers.add(
+                                mMap.addMarker(new MarkerOptions()
+                                        .title(place.getName())
+                                        .position(
+                                                new LatLng(place.getLatitude(), place.getLongitude()))
+                                        .icon(BitmapDescriptorFactory.fromBitmap(place.getBitmapIcon()))
+                                        .snippet(place.getVicinity()))
+                        );
+                    }
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(result.get(0).getLatitude(), result
+                                .get(0).getLongitude())) // Sets the center of the map to
+                                // Mountain View
+                        .zoom(15) // Sets the zoom
+                        .tilt(30) // Sets the tilt of the camera to 30 degrees
+                        .build(); // Creates a CameraPosition from the builder
+                mMap.animateCamera(CameraUpdateFactory
+                        .newCameraPosition(cameraPosition));
 
-            if (places.contentEquals("cafe")) {
-                placeInfo.setIcon(R.drawable.ic_local_restaurant_red_500_24dp);
-                placeInfo.setTitle("Found " + result.size() + " eateries near you");
-            } else if (places.contentEquals("gas_station")) {
-                placeInfo.setIcon(R.drawable.ic_local_gas_station_red_500_24dp);
-                placeInfo.setTitle("Found " + result.size() + " Gas stations near you");
+                if (places.contentEquals("cafe")) {
+                    placeInfo.setIcon(R.drawable.ic_local_restaurant_red_500_24dp);
+                    placeInfo.setTitle("Found " + result.size() + " eateries near you");
+                } else if (places.contentEquals("gas_station")) {
+                    placeInfo.setIcon(R.drawable.ic_local_gas_station_red_500_24dp);
+                    placeInfo.setTitle("Found " + result.size() + " Gas stations near you");
+                }
+                placeInfo.setSubTitle("");
+                mAdapter.updateList(result);
+                bottomSheet.setAnchorPoint(0.5f);
+                bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+            }else{
+                Toast.makeText(context,"Error connecting to Google Services",Toast.LENGTH_SHORT).show();
             }
-            placeInfo.setSubTitle("");
-            mAdapter.updateList(result);
-            bottomSheet.setAnchorPoint(0.5f);
-            bottomSheet.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
     }
 }
