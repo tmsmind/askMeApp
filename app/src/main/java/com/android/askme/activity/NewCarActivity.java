@@ -141,6 +141,7 @@ public class NewCarActivity extends AppCompatActivity implements View.OnClickLis
                         selectedCar = carsList.get(which);
                         carMake.setSubTitle(selectedCar.getTitle());
                         newCar.setCarMake(selectedCar.getTitle());
+                        carModel.setVisibility(View.VISIBLE);
                         return true;
                     }
                 })

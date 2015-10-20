@@ -97,6 +97,7 @@
                 app:li_title="Car Make" />
 
             <com.android.askme.utils.ui.ListItem
+                android:visibility="gone"
                 android:id="@+id/car_model"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
