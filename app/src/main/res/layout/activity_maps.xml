@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/login_gradient_background"
     android:layout_width="match_parent"
@@ -9,17 +9,24 @@
     tools:context=".activities.MapsActivity">
 
     <fragment
-        android:layout_weight="1"
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <com.android.askme.utils.ui.WrapContentViewPager
+        android:layout_margin="5dp"
+        android:layout_gravity="top"
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
+        android:layout_margin="16dp"
+        android:layout_gravity="right|bottom"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <ImageButton
@@ -28,12 +35,6 @@
             android:src="@drawable/ic_chevron_left_black_36dp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
-
-        <com.android.askme.utils.ui.DynamicHeightViewPager
-            android:id="@+id/view_pager"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
 
         <ImageButton
             android:id="@+id/button_next"
@@ -44,4 +45,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

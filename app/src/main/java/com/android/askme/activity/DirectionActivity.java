@@ -20,8 +20,8 @@ import com.android.askme.R;
 import com.android.askme.models.DirectionInstructions;
 import com.android.askme.models.Event;
 import com.android.askme.utils.GoogleDirection;
-import com.android.askme.utils.ui.DynamicHeightViewPager;
-import com.android.askme.utils.ui.ListItem;
+import com.android.askme.utils.ui.ListItemCard;
+import com.android.askme.utils.ui.WrapContentViewPager;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -56,7 +56,7 @@ public class DirectionActivity extends AppCompatActivity implements OnMapReadyCa
 
     ImageButton buttonPrevious;
     ImageButton buttonNext;
-    DynamicHeightViewPager viewPager;
+    WrapContentViewPager viewPager;
 
 
     ArrayList<LatLng> sections = new ArrayList<>();
@@ -100,7 +100,7 @@ public class DirectionActivity extends AppCompatActivity implements OnMapReadyCa
         buttonPrevious = (ImageButton) findViewById(R.id.button_previous);
         buttonNext = (ImageButton) findViewById(R.id.button_next);
 
-        viewPager = (DynamicHeightViewPager) findViewById(R.id.view_pager);
+        viewPager = (WrapContentViewPager) findViewById(R.id.view_pager);
 
 
         buttonPrevious.setOnClickListener(new View.OnClickListener() {
@@ -238,7 +238,7 @@ public class DirectionActivity extends AppCompatActivity implements OnMapReadyCa
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            ListItem item = new ListItem(mContext);
+            ListItemCard item = new ListItemCard(mContext);
             item.setSingleLine(false);
             item.setTitle(String.valueOf(Html.fromHtml(directionInstructions.get(position).getInstruction())));
             item.setSubTitle("in " + directionInstructions.get(position).getDurationText() + "(" + directionInstructions.get(position).getDistanceText() + ")");
