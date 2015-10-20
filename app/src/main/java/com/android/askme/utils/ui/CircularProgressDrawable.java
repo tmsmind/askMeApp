@@ -1,6 +1,6 @@
 /*
  * ==================================================================
- *   Copyright (c) 2015 Dhanraj Padmashali (Humesis, Inc.)
+ *   Copyright (c) 2015 Anand Sharma (Humesis, Inc.)
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 package com.android.askme.utils.ui;
 
 /**
- * Created by dhanraj on 21/03/15.
+ * Created by Anand Sharmaon 21/03/15.
  */
 
 import android.animation.Animator;

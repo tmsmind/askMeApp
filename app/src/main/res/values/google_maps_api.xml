@@ -1,6 +1,6 @@
 <!--
   ~ ==================================================================
-  ~   Copyright (c) 2015 Dhanraj Padmashali (Humesis, Inc.)
+  ~   Copyright (c) 2015 Anand Sharma (Humesis, Inc.)
   ~
   ~   Permission is hereby granted, free of charge, to any person obtaining a copy
   ~   of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,10 @@
     string in this file.
     -->
     <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">
-        AIzaSyCZuGMaBTXR-pvJJWiVlfnE8Oi1ewtpU-U
+        Add Your API Key here
     </string>
 
     <string name="places_web_key" translatable="false" templateMergeStrategy="preserve">
-        AIzaSyC1zjo5QRoL63mzom1ZKjzENePUdXJJuNI
+        Add your API Key here
     </string>
 </resources>
