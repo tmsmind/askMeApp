@@ -198,9 +198,14 @@ public class MainActivity extends AppCompatActivity implements  GoogleApiClient.
                                 .withIcon(localProfile.getProfilePic())
                 )
                 .build();
-
         ImageView view = headerResult.getHeaderBackgroundView();
-        Picasso.with(view.getContext()).load(localProfile.coverPic).placeholder(R.drawable.header).into(view);
+
+        try {
+            Picasso.with(view.getContext()).load(localProfile.coverPic).placeholder(R.drawable.header).into(view);
+        }catch (Exception e){
+            e.printStackTrace();
+            Picasso.with(view.getContext()).load(R.drawable.header).placeholder(R.drawable.header).into(view);
+        }
 
         result = new DrawerBuilder()
                 .withActivity(this)

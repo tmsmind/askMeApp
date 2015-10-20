@@ -179,10 +179,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        getLastKnownLocation();
         mMap.setOnMyLocationChangeListener(this);
-        mMap.setMyLocationEnabled(false);
+        mMap.setMyLocationEnabled(true);
         mMap.setOnCameraChangeListener(this);
+        zoomToLocation(mMap.getMyLocation());
     }
 
     @Override
