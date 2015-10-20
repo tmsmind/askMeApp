@@ -94,7 +94,12 @@ public class NearbyAdapter extends BaseAdapter {
 
         holder.name.setText(placeInfo.getName());
         holder.description.setText(placeInfo.getVicinity());
-        Picasso.with(mContext).load(placeInfo.getIcon()).into(holder.icon);
+        try {
+            Picasso.with(mContext).load(placeInfo.getIcon()).into(holder.icon);
+        }catch (Exception e){
+            e.printStackTrace();
+            Picasso.with(mContext).load(R.drawable.ic_place_marker).into(holder.icon);
+        }
 
         return view;
     }
